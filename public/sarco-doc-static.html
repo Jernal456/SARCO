@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SARCO-Doc | Portal Referensi Cepat Asuhan Keperawatan</title>
+<style>
+  :root{
+    --navy:#0e2a3d;
+    --teal:#0f6e6e;
+    --teal-dark:#0b5252;
+    --green:#2f8f4e;
+    --lightgreen:#eaf7ee;
+    --mint:#f3fbf6;
+    --gold:#e8b93e;
+    --white:#ffffff;
+    --gray:#5b6b6b;
+    --border:#e1efe6;
+    --red:#c0392b;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;font-family:'Segoe UI',Tahoma,sans-serif;background:var(--mint);color:var(--navy);}
+
+  header{
+    background:linear-gradient(90deg,var(--teal-dark),var(--green));
+    color:#fff;padding:16px 40px;
+    display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:100;
+    box-shadow:0 3px 14px rgba(0,0,0,.18);
+  }
+  header .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:20px;letter-spacing:1px;cursor:pointer;}
+  header .brand span.small{display:block;font-weight:400;font-size:10.5px;letter-spacing:.4px;opacity:.9;}
+  nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+  nav .navitem{position:relative;}
+  nav button.navbtn{
+    background:none;border:none;color:#fff;font-size:13.5px;font-weight:600;
+    padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:5px;
+    opacity:.92;border-radius:6px;transition:.15s;white-space:nowrap;
+  }
+  nav button.navbtn:hover, nav button.navbtn.active{background:rgba(255,255,255,.16);opacity:1;}
+  nav .caret{font-size:10px;transition:.2s;}
+  nav .navitem.open .caret{transform:rotate(180deg);}
+  .dropdown{
+    position:absolute;top:110%;left:0;background:#fff;border-radius:10px;
+    min-width:220px;box-shadow:0 14px 30px rgba(0,0,0,.18);padding:8px;display:none;z-index:200;
+  }
+  .navitem.open .dropdown{display:block;}
+  .dropdown a{display:block;padding:10px 14px;color:var(--navy);text-decoration:none;font-size:13.5px;font-weight:600;border-radius:7px;}
+  .dropdown a:hover{background:var(--lightgreen);color:var(--teal-dark);}
+  @media (max-width:960px){
+    header{padding:14px 18px;}
+    nav button.navbtn{padding:9px 9px;font-size:11.5px;}
+    header .brand span.small{display:none;}
+  }
+
+  .page{display:none;animation:fade .35s ease;}
+  .page.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  .hero{
+    position:relative;
+    background:radial-gradient(circle at 15% 20%, rgba(255,255,255,.12), transparent 40%),
+      linear-gradient(120deg,var(--teal-dark) 0%, var(--teal) 45%, var(--green) 100%);
+    color:#fff;padding:66px 40px 86px;text-align:center;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;bottom:-2px;left:0;right:0;height:70px;
+    background:var(--mint);clip-path:polygon(0 60%, 100% 0%, 100% 100%, 0% 100%);
+  }
+  .hero h1{font-size:42px;margin:0;letter-spacing:2px;font-weight:800;}
+  .hero p.tag{font-size:16px;font-weight:500;margin:10px 0 0;opacity:.95;}
+  .hero .oneclick{display:inline-flex;align-items:center;gap:14px;margin-top:20px;font-style:italic;font-weight:700;font-size:18px;}
+  .hero .oneclick .dot{width:8px;height:8px;border-radius:50%;background:#fff;}
+  .hero .badge{
+    display:inline-block;margin-top:20px;background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.5);color:#fff;padding:9px 24px;border-radius:30px;
+    font-size:13px;letter-spacing:.6px;font-weight:600;
+  }
+  .hero .welcome{position:relative;z-index:2;margin-top:32px;font-size:14.5px;font-weight:600;color:#eafff1;}
+
+  .home-body{max-width:1080px;margin:0 auto;padding:20px 30px 70px;}
+  .quick-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:10px;}
+  @media (max-width:1000px){.quick-grid{grid-template-columns:repeat(3,1fr);}}
+  @media (max-width:640px){.quick-grid{grid-template-columns:1fr 1fr;}}
+  .quick-card{
+    background:#fff;border:1px solid var(--border);border-radius:16px;padding:22px 14px;
+    text-align:center;cursor:pointer;transition:.2s;box-shadow:0 4px 14px rgba(15,110,110,.06);
+  }
+  .quick-card:hover{transform:translateY(-5px);box-shadow:0 14px 26px rgba(15,110,110,.16);border-color:var(--teal);}
+  .quick-card .qi{font-size:28px;margin-bottom:8px;}
+  .quick-card h4{margin:0 0 3px;font-size:13.5px;color:var(--navy);}
+  .quick-card p{margin:0;font-size:11px;color:var(--gray);}
+
+  .section-title{text-align:center;margin:52px 0 6px;font-size:23px;color:var(--navy);font-weight:800;}
+  .section-sub{text-align:center;color:var(--gray);font-size:13.5px;margin-bottom:26px;}
+
+  .top10{background:#fff;border:1px solid var(--border);border-radius:16px;padding:10px 26px;box-shadow:0 4px 14px rgba(15,110,110,.05);}
+  .top10 ol{margin:0;padding-left:22px;}
+  .top10 li{padding:11px 0;font-size:14px;border-bottom:1px dashed var(--border);color:#2c3f47;}
+  .top10 li:last-child{border-bottom:none;}
+  .top10 li b{color:var(--teal-dark);}
+  .top10 li .ket{display:block;font-size:12px;color:var(--gray);margin-top:2px;}
+
+  .page-banner{background:linear-gradient(90deg,var(--navy),var(--teal-dark));color:#fff;padding:32px 40px;text-align:center;}
+  .page-banner h2{margin:0;font-size:26px;letter-spacing:1px;}
+  .page-banner p{margin:6px 0 0;font-size:13px;opacity:.85;}
+
+  .content-wrap{max-width:960px;margin:0 auto;padding:36px 26px 70px;}
+
+  .selector-box{
+    background:#fff;border:1px solid var(--border);border-radius:16px;
+    padding:22px 24px;margin-bottom:26px;box-shadow:0 4px 14px rgba(15,110,110,.05);
+  }
+  .selector-box .label{font-size:13px;font-weight:700;color:var(--teal-dark);margin-bottom:12px;letter-spacing:.4px;}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{
+    padding:9px 16px;border-radius:30px;border:1.5px solid var(--border);
+    background:var(--mint);color:var(--navy);font-size:13px;font-weight:600;
+    cursor:pointer;transition:.15s;display:flex;align-items:center;gap:6px;
+  }
+  .chip:hover{border-color:var(--teal);color:var(--teal-dark);}
+  .chip.active{background:linear-gradient(90deg,var(--teal),var(--green));color:#fff;border-color:transparent;}
+
+  .result-area{min-height:60px;}
+  .empty-hint{
+    text-align:center;color:var(--gray);font-size:13.5px;padding:40px 20px;
+    border:1.5px dashed var(--border);border-radius:14px;background:#fff;
+  }
+
+  .res-card{
+    background:#fff;border:1px solid var(--border);border-radius:16px;
+    padding:22px 24px;margin-bottom:18px;box-shadow:0 4px 14px rgba(15,110,110,.06);
+    animation:fade .3s ease;
+  }
+  .res-card h3{margin:0 0 4px;color:var(--navy);font-size:17px;display:flex;align-items:center;gap:8px;}
+  .res-card .kode{
+    display:inline-block;background:var(--lightgreen);color:var(--teal-dark);
+    font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:6px;letter-spacing:.4px;
+  }
+  .res-card .def{font-size:12.5px;color:var(--gray);margin:4px 0 14px;line-height:1.5;}
+  .subhead{font-size:12px;font-weight:800;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px;}
+  .res-card ul{margin:0;padding-left:20px;}
+  .res-card li{font-size:13.5px;line-height:1.65;color:#2c3f47;margin-bottom:3px;}
+  .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+  .tag-pill{background:var(--mint);border:1px solid var(--border);color:var(--navy);font-size:12px;padding:6px 12px;border-radius:20px;}
+
+  .profil-box{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px 30px;margin-bottom:22px;box-shadow:0 4px 14px rgba(15,110,110,.05);}
+  .profil-box h3{margin:0 0 10px;color:var(--teal-dark);font-size:18px;border-left:5px solid var(--gold);padding-left:12px;}
+  .profil-box p, .profil-box li{font-size:14px;line-height:1.7;color:#33474f;}
+  .profil-box ul{margin:8px 0 0;padding-left:20px;}
+
+  .kontak-card{
+    background:#fff;border-radius:18px;border:1px solid var(--border);
+    box-shadow:0 8px 24px rgba(15,110,110,.08);padding:36px;display:flex;gap:28px;align-items:center;
+  }
+  @media (max-width:640px){.kontak-card{flex-direction:column;text-align:center;}}
+  .avatar{
+    flex:0 0 96px;width:96px;height:96px;border-radius:50%;
+    background:linear-gradient(135deg,var(--teal),var(--green));color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;
+  }
+  .kontak-info h3{margin:0 0 2px;color:var(--navy);font-size:20px;}
+  .kontak-info .role{color:var(--teal-dark);font-weight:700;font-size:13.5px;margin-bottom:14px;}
+  .kontak-row{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#33474f;margin-bottom:8px;}
+  .kontak-row a{color:var(--teal-dark);text-decoration:none;font-weight:600;}
+  .kontak-row a:hover{text-decoration:underline;}
+
+  footer{text-align:center;padding:26px;font-size:12px;color:var(--gray);border-top:1px solid var(--border);background:#fff;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand" onclick="showPage('home')">
+    🩺
+    <div>SARCO-Doc<span class="small">Smart Access for Recording Care &amp; Documentation</span></div>
+  </div>
+  <nav>
+    <div class="navitem"><button class="navbtn" onclick="showPage('home')" id="nav-home">HOME</button></div>
+
+    <div class="navitem" id="dd-profil">
+      <button class="navbtn" onclick="toggleDropdown('dd-profil')">PROFIL <span class="caret">▾</span></button>
+      <div class="dropdown">
+        <a href="#" onclick="showPage('profil','tentang');return false;">Tentang SARCO-Doc</a>
+        <a href="#" onclick="showPage('profil','visikab');return false;">Visi-Misi Kabupaten</a>
+        <a href="#" onclick="showPage('profil','visipkm');return false;">Visi-Misi Puskesmas</a>
+        <a href="#" onclick="showPage('profil','regulasi');return false;">Regulasi</a>
+      </div>
+    </div>
+
+    <div class="navitem" id="dd-askep">
+      <button class="navbtn" onclick="toggleDropdown('dd-askep')">ASKEP <span class="caret">▾</span></button>
+      <div class="dropdown">
+        <a href="#" onclick="showPage('pengkajian');return false;">Pengkajian</a>
+        <a href="#" onclick="showPage('diagnosa');return false;">Diagnosa</a>
+        <a href="#" onclick="showPage('intervensi');return false;">Intervensi</a>
+        <a href="#" onclick="showPage('implementasi');return false;">Implementasi</a>
+        <a href="#" onclick="showPage('evaluasi');return false;">Evaluasi</a>
+        <a href="#" onclick="showPage('penunjang');return false;">Pemeriksaan Penunjang</a>
+      </div>
+    </div>
+
+    <div class="navitem"><button class="navbtn" onclick="showPage('kontak')" id="nav-kontak">KONTAK</button></div>
+  </nav>
+</header>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <h1>SARCO-DOC</h1>
+    <p class="tag">Smart Access for Recording Care &amp; Documentation</p>
+    <div class="oneclick"><span class="dot"></span> One Click, Askep Done <span class="dot"></span></div>
+    <div class="badge">Portal Referensi Cepat Asuhan Keperawatan</div>
+    <div class="welcome">👋 Selamat Datang, Rekan Perawat! Klik keluhan pasien, langsung dapat rujukan asuhan keperawatannya.</div>
+  </div>
+
+  <div class="home-body">
+    <h2 class="section-title">Akses Cepat 6 Tahap Askep</h2>
+    <p class="section-sub">Klik tahap yang dibutuhkan, lalu pilih keluhan pasien</p>
+    <div class="quick-grid">
+      <div class="quick-card" onclick="showPage('pengkajian')"><div class="qi">🪪</div><h4>Pengkajian</h4><p>Fokus data yang digali</p></div>
+      <div class="quick-card" onclick="showPage('diagnosa')"><div class="qi">🔍</div><h4>Diagnosa</h4><p>Diagnosa SDKI per keluhan</p></div>
+      <div class="quick-card" onclick="showPage('intervensi')"><div class="qi">🗂️</div><h4>Intervensi</h4><p>Rencana tindakan SIKI</p></div>
+      <div class="quick-card" onclick="showPage('implementasi')"><div class="qi">🩹</div><h4>Implementasi</h4><p>Contoh pelaksanaan</p></div>
+      <div class="quick-card" onclick="showPage('evaluasi')"><div class="qi">✅</div><h4>Evaluasi</h4><p>Kriteria hasil (SOAP)</p></div>
+      <div class="quick-card" onclick="showPage('penunjang')"><div class="qi">🧪</div><h4>Pemeriksaan Penunjang</h4><p>Lab &amp; diagnostik terkait</p></div>
+    </div>
+
+    <h2 class="section-title">10 Diagnosa Keperawatan Terbanyak di Puskesmas</h2>
+    <p class="section-sub">Berdasarkan pola kasus rawat jalan yang umum ditemui</p>
+    <div class="top10"><ol id="top10-list"></ol></div>
+  </div>
+</section>
+
+<section class="page" id="page-profil">
+  <div class="page-banner"><h2>PROFIL</h2><p>Informasi seputar SARCO-Doc, visi-misi, dan regulasi terkait</p></div>
+  <div class="content-wrap">
+    <div class="profil-box" id="prof-tentang">
+      <h3>🏥 Tentang SARCO-Doc</h3>
+      <p>SARCO-Doc (Smart Access for Recording Care &amp; Documentation) adalah portal referensi cepat bagi perawat
+      di puskesmas untuk menyusun asuhan keperawatan. Cukup pilih keluhan utama pasien, portal ini langsung menampilkan
+      arah pengkajian, diagnosa keperawatan (SDKI), intervensi (SIKI), contoh implementasi, kriteria evaluasi, hingga
+      pemeriksaan penunjang yang relevan — "One Click, Askep Done".</p>
+    </div>
+    <div class="profil-box" id="prof-visikab">
+      <h3>🏛️ Visi-Misi Kabupaten</h3>
+      <p><b>Visi:</b> Terwujudnya masyarakat Kabupaten Sumba Barat yang sehat, mandiri, dan berdaya saing.</p>
+      <ul>
+        <li>Meningkatkan akses dan mutu pelayanan kesehatan dasar.</li>
+        <li>Mendorong inovasi pelayanan publik berbasis teknologi digital.</li>
+        <li>Meningkatkan kualitas sumber daya manusia kesehatan.</li>
+      </ul>
+    </div>
+    <div class="profil-box" id="prof-visipkm">
+      <h3>📍 Visi-Misi Puskesmas Malata</h3>
+      <p><b>Visi:</b> Menjadi Puskesmas dengan pelayanan keperawatan yang profesional, bermutu, dan berbasis data.</p>
+      <ul>
+        <li>Memberikan asuhan keperawatan yang komprehensif dan berkesinambungan.</li>
+        <li>Mendorong pendokumentasian keperawatan yang akurat dan efisien.</li>
+        <li>Meningkatkan kepuasan dan keselamatan pasien.</li>
+      </ul>
+    </div>
+    <div class="profil-box" id="prof-regulasi">
+      <h3>📜 Regulasi</h3>
+      <ul>
+        <li>Undang-Undang No. 38 Tahun 2014 tentang Keperawatan.</li>
+        <li>Permenkes No. 26 Tahun 2019 tentang Peraturan Pelaksanaan UU Keperawatan.</li>
+        <li>Standar Diagnosis Keperawatan Indonesia (SDKI).</li>
+        <li>Standar Intervensi Keperawatan Indonesia (SIKI).</li>
+        <li>Standar Luaran Keperawatan Indonesia (SLKI).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-pengkajian">
+  <div class="page-banner"><h2>PENGKAJIAN</h2><p>Pilih keluhan pasien untuk melihat fokus data yang perlu digali</p></div>
+  <div class="content-wrap">
+    <div class="selector-box"><div class="label">🔎 PILIH KELUHAN UTAMA</div><div class="chips" id="chips-pengkajian"></div></div>
+    <div class="result-area" id="result-pengkajian"><div class="empty-hint">Silakan pilih salah satu keluhan di atas untuk menampilkan fokus pengkajian.</div></div>
+  </div>
+</section>
+
+<section class="page" id="page-diagnosa">
+  <div class="page-banner"><h2>DIAGNOSA KEPERAWATAN</h2><p>Pilih keluhan pasien untuk melihat diagnosa SDKI yang relevan</p></div>
+  <div class="content-wrap">
+    <div class="selector-box"><div class="label">🔎 PILIH KELUHAN UTAMA</div><div class="chips" id="chips-diagnosa"></div></div>
+    <div class="result-area" id="result-diagnosa"><div class="empty-hint">Silakan pilih salah satu keluhan di atas untuk menampilkan diagnosa keperawatan (SDKI).</div></div>
+  </div>
+</section>
+
+<section class="page" id="page-intervensi">
+  <div class="page-banner"><h2>INTERVENSI KEPERAWATAN</h2><p>Pilih keluhan pasien untuk melihat rencana tindakan (SIKI)</p></div>
+  <div class="content-wrap">
+    <div class="selector-box"><div class="label">🔎 PILIH KELUHAN UTAMA</div><div class="chips" id="chips-intervensi"></div></div>
+    <div class="result-area" id="result-intervensi"><div class="empty-hint">Silakan pilih salah satu keluhan di atas untuk menampilkan rencana intervensi (SIKI).</div></div>
+  </div>
+</section>
+
+<section class="page" id="page-implementasi">
+  <div class="page-banner"><h2>IMPLEMENTASI KEPERAWATAN</h2><p>Pilih keluhan pasien untuk melihat contoh pelaksanaan tindakan</p></div>
+  <div class="content-wrap">
+    <div class="selector-box"><div class="label">🔎 PILIH KELUHAN UTAMA</div><div class="chips" id="chips-implementasi"></div></div>
+    <div class="result-area" id="result-implementasi"><div class="empty-hint">Silakan pilih salah satu keluhan di atas untuk menampilkan contoh implementasi.</div></div>
+  </div>
+</section>
+
+<section class="page" id="page-evaluasi">
+  <div class="page-banner"><h2>EVALUASI KEPERAWATAN</h2><p>Pilih keluhan pasien untuk melihat kriteria hasil &amp; contoh SOAP</p></div>
+  <div class="content-wrap">
+    <div class="selector-box"><div class="label">🔎 PILIH KELUHAN UTAMA</div><div class="chips" id="chips-evaluasi"></div></div>
+    <div class="result-area" id="result-evaluasi"><div class="empty-hint">Silakan pilih salah satu keluhan di atas untuk menampilkan kriteria evaluasi.</div></div>
+  </div>
+</section>
+
+<section class="page" id="page-penunjang">
+  <div class="page-banner"><h2>PEMERIKSAAN PENUNJANG</h2><p>Pilih keluhan pasien untuk melihat rekomendasi pemeriksaan penunjang</p></div>
+  <div class="content-wrap">
+    <div class="selector-box"><div class="label">🔎 PILIH KELUHAN UTAMA</div><div class="chips" id="chips-penunjang"></div></div>
+    <div class="result-area" id="result-penunjang"><div class="empty-hint">Silakan pilih salah satu keluhan di atas untuk menampilkan rekomendasi pemeriksaan penunjang.</div></div>
+  </div>
+</section>
+
+<section class="page" id="page-kontak">
+  <div class="page-banner"><h2>KONTAK</h2><p>Hubungi pengembang inovasi SARCO-Doc</p></div>
+  <div class="content-wrap">
+    <div class="kontak-card">
+      <div class="avatar">JS</div>
+      <div class="kontak-info">
+        <h3>Jernal Sarco AL, S.Kep., Ns</h3>
+        <div class="role">Perawat Ahli Pertama — Puskesmas Malata</div>
+        <div class="kontak-row">✉️ <a href="mailto:jernal.sarco.pwt8b@gmail.com">jernal.sarco.pwt8b@gmail.com</a></div>
+        <div class="kontak-row">💬 <a href="https://wa.me/qr/YSEZLARNUKBGD1" target="_blank">WhatsApp Pengembang</a></div>
+        <div class="kontak-row">📍 Puskesmas Malata, Kabupaten Sumba Barat, NTT</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>© SARCO-Doc — Portal Referensi Cepat Asuhan Keperawatan, Puskesmas Malata, NTT</footer>
+
+<script>
+function showPage(page, anchor){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const map = {home:'nav-home', kontak:'nav-kontak'};
+  if(map[page]) document.getElementById(map[page]).classList.add('active');
+  closeAllDropdowns();
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(anchor){
+    setTimeout(()=>{
+      const el = document.getElementById('prof-'+anchor);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 120);
+  }
+}
+function toggleDropdown(id){
+  const item = document.getElementById(id);
+  const wasOpen = item.classList.contains('open');
+  closeAllDropdowns();
+  if(!wasOpen) item.classList.add('open');
+}
+function closeAllDropdowns(){document.querySelectorAll('.navitem').forEach(i=>i.classList.remove('open'));}
+document.addEventListener('click', function(e){ if(!e.target.closest('.navitem')) closeAllDropdowns(); });
+
+const kasusList = [
+  {key:'demam', label:'Demam', icon:'🌡️'},
+  {key:'nyeri', label:'Nyeri Akut', icon:'😖'},
+  {key:'sesak', label:'Sesak Napas', icon:'🫁'},
+  {key:'batuk', label:'Batuk Berdahak', icon:'🤧'},
+  {key:'diare', label:'Diare', icon:'🚽'},
+  {key:'mual', label:'Mual &amp; Muntah', icon:'🤢'},
+  {key:'pusing', label:'Pusing / Vertigo', icon:'💫'},
+  {key:'hipertensi', label:'Hipertensi', icon:'❤️‍🩹'},
+  {key:'luka', label:'Luka Terbuka', icon:'🩹'},
+  {key:'lemah', label:'Kelemahan Fisik', icon:'🦵'}
+];
+
+const top10Diagnosa = [
+  {dx:"Hipertermia", ket:"berhubungan dengan proses penyakit / infeksi"},
+  {dx:"Nyeri Akut", ket:"berhubungan dengan agen pencedera fisiologis"},
+  {dx:"Defisit Pengetahuan", ket:"berhubungan dengan kurang terpapar informasi"},
+  {dx:"Diare", ket:"berhubungan dengan proses infeksi / iritasi gastrointestinal"},
+  {dx:"Pola Napas Tidak Efektif", ket:"berhubungan dengan hambatan upaya napas"},
+  {dx:"Risiko Defisit Nutrisi", ket:"berhubungan dengan mual, muntah, atau anoreksia"},
+  {dx:"Intoleransi Aktivitas", ket:"berhubungan dengan kelemahan fisik"},
+  {dx:"Risiko Hipovolemia", ket:"berhubungan dengan kehilangan cairan aktif"},
+  {dx:"Gangguan Rasa Nyaman", ket:"berhubungan dengan gejala penyakit"},
+  {dx:"Risiko Infeksi", ket:"berhubungan dengan kerusakan integritas kulit / luka terbuka"}
+];
+
+const data = {
+  demam:{
+    pengkajian:{
+      subjektif:["Sejak kapan demam dirasakan, pola demam (naik-turun/terus-menerus)","Adakah menggigil, keringat berlebih, nyeri kepala","Riwayat bepergian, kontak dengan orang sakit, riwayat imunisasi"],
+      objektif:["Suhu tubuh (termometer), akral hangat/dingin","Warna kulit (kemerahan), kelembapan kulit","Tanda dehidrasi: mukosa bibir, turgor kulit"],
+      vital:["Suhu tubuh — fokus utama","Nadi (biasanya meningkat mengikuti suhu)","Tekanan darah dan frekuensi napas"]
+    },
+    diagnosa:[
+      {kode:"D.0130",nama:"Hipertermia",def:"Suhu tubuh meningkat di atas rentang normal akibat proses penyakit, infeksi, atau dehidrasi."},
+      {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan kurang nyaman akibat gejala penyakit seperti demam, menggigil, dan lemas."}
+    ],
+    intervensi:[
+      {dx:"Hipertermia",observasi:["Monitor suhu tubuh secara berkala","Monitor tanda dehidrasi dan komplikasi demam"],terapeutik:["Longgarkan atau lepaskan pakaian","Berikan kompres hangat pada dahi/lipatan tubuh","Anjurkan tirah baring"],edukasi:["Anjurkan perbanyak minum air putih","Jelaskan tanda kegawatan yang perlu segera dilaporkan"],kolaborasi:["Kolaborasi pemberian antipiretik sesuai indikasi"]},
+      {dx:"Gangguan Rasa Nyaman",observasi:["Identifikasi sumber ketidaknyamanan"],terapeutik:["Ciptakan lingkungan yang tenang dan sejuk","Atur posisi senyaman mungkin"],edukasi:["Ajarkan teknik relaksasi sederhana"],kolaborasi:["Kolaborasi pemberian analgesik/antipiretik bila perlu"]}
+    ],
+    implementasi:["Mengukur dan mencatat suhu tubuh tiap 3–4 jam","Memberikan kompres hangat dan memantau respons pasien","Menganjurkan dan memantau asupan cairan oral","Memberikan antipiretik sesuai instruksi dan mencatat waktu pemberian"],
+    evaluasi:{s:"Pasien mengatakan badan sudah tidak terlalu panas / menggigil berkurang.",o:"Suhu tubuh turun mendekati rentang normal (36.5–37.5°C), kulit tidak teraba panas.",a:"Masalah Hipertermia teratasi sebagian.",p:"Lanjutkan pemantauan suhu tiap shift, anjurkan cukup istirahat dan cairan."},
+    penunjang:["Pemeriksaan darah lengkap (leukosit, hitung jenis) untuk cek tanda infeksi","Tes malaria/DBD (NS1, apusan darah) bila endemis","Kultur bila demam berkepanjangan &gt;3 hari","Urinalisis bila dicurigai infeksi saluran kemih"]
+  },
+  nyeri:{
+    pengkajian:{
+      subjektif:["Kaji nyeri dengan PQRST (Provokes, Quality, Region, Severity, Time)","Skala nyeri 0–10","Riwayat nyeri sebelumnya dan obat yang sudah dikonsumsi"],
+      objektif:["Ekspresi wajah (meringis), posisi tubuh melindungi area nyeri","Perubahan tanda vital akibat nyeri","Area, luas, dan tanda peradangan lokal bila ada"],
+      vital:["Tekanan darah dan nadi (dapat meningkat saat nyeri hebat)","Frekuensi napas (dapat meningkat/dangkal)"]
+    },
+    diagnosa:[
+      {kode:"D.0077",nama:"Nyeri Akut",def:"Pengalaman sensorik/emosional tidak menyenangkan akibat kerusakan jaringan aktual atau potensial, berlangsung kurang dari 3 bulan."},
+      {kode:"D.0056",nama:"Intoleransi Aktivitas",def:"Ketidakcukupan energi untuk melakukan aktivitas sehari-hari akibat nyeri atau kondisi fisik."}
+    ],
+    intervensi:[
+      {dx:"Nyeri Akut",observasi:["Identifikasi lokasi, karakteristik, durasi, dan skala nyeri","Monitor efek samping penggunaan analgesik"],terapeutik:["Berikan teknik nonfarmakologis (relaksasi napas dalam, distraksi, kompres)","Atur posisi yang mengurangi nyeri","Kontrol lingkungan yang memperberat nyeri"],edukasi:["Jelaskan penyebab dan pemicu nyeri","Ajarkan teknik nonfarmakologis untuk meredakan nyeri"],kolaborasi:["Kolaborasi pemberian analgesik sesuai indikasi"]},
+      {dx:"Intoleransi Aktivitas",observasi:["Identifikasi gangguan fungsi tubuh akibat nyeri"],terapeutik:["Bantu pasien dalam aktivitas bertahap sesuai toleransi"],edukasi:["Anjurkan istirahat cukup dan aktivitas bertahap"],kolaborasi:["Kolaborasi dengan fisioterapi bila diperlukan"]}
+    ],
+    implementasi:["Melakukan pengkajian nyeri ulang secara berkala dengan skala yang sama","Mengajarkan dan mendampingi teknik relaksasi napas dalam","Memberikan analgesik sesuai instruksi dan memantau efektivitasnya","Membantu mengatur posisi nyaman pasien"],
+    evaluasi:{s:"Pasien mengatakan nyeri berkurang dari skala 7 menjadi skala 3.",o:"Ekspresi wajah lebih rileks, pasien mampu beraktivitas ringan.",a:"Masalah Nyeri Akut teratasi sebagian.",p:"Lanjutkan pemantauan skala nyeri dan terapi analgesik sesuai program."},
+    penunjang:["Pemeriksaan penunjang sesuai sumber nyeri (rontgen bila muskuloskeletal, USG bila abdomen)","Pemeriksaan darah lengkap bila dicurigai proses infeksi/inflamasi","EKG bila nyeri dada untuk menyingkirkan kausa jantung"]
+  },
+  sesak:{
+    pengkajian:{
+      subjektif:["Sejak kapan sesak dirasakan, faktor pemicu dan pereda","Riwayat asma, PPOK, atau penyakit jantung sebelumnya","Kemampuan bicara dalam kalimat penuh/terputus"],
+      objektif:["Penggunaan otot bantu napas, retraksi dinding dada","Warna kulit/bibir (sianosis)","Suara napas tambahan (wheezing, ronkhi)"],
+      vital:["Frekuensi dan pola napas — fokus utama","Saturasi oksigen (SpO2)","Nadi dan tekanan darah"]
+    },
+    diagnosa:[
+      {kode:"D.0005",nama:"Pola Napas Tidak Efektif",def:"Inspirasi/ekspirasi yang tidak memberikan ventilasi adekuat akibat hambatan upaya napas."},
+      {kode:"D.0003",nama:"Gangguan Pertukaran Gas",def:"Kelebihan atau kekurangan oksigenasi/eliminasi karbondioksida pada membran alveolus-kapiler."}
+    ],
+    intervensi:[
+      {dx:"Pola Napas Tidak Efektif",observasi:["Monitor frekuensi, kedalaman, dan upaya napas","Monitor saturasi oksigen"],terapeutik:["Posisikan semi-Fowler atau Fowler","Berikan oksigen sesuai kebutuhan"],edukasi:["Ajarkan teknik napas dalam dan batuk efektif"],kolaborasi:["Kolaborasi pemberian bronkodilator/terapi inhalasi sesuai indikasi"]},
+      {dx:"Gangguan Pertukaran Gas",observasi:["Monitor tanda-tanda hipoksia (gelisah, sianosis)"],terapeutik:["Pertahankan kepatenan jalan napas"],edukasi:["Anjurkan pasien melaporkan bila sesak memberat"],kolaborasi:["Kolaborasi pemeriksaan analisa gas darah bila tersedia rujukan"]}
+    ],
+    implementasi:["Memberikan posisi semi-Fowler dan memantau kenyamanan pasien","Memasang dan memonitor terapi oksigen sesuai instruksi","Memantau saturasi oksigen dan frekuensi napas tiap 1–2 jam","Mendampingi latihan napas dalam dan batuk efektif"],
+    evaluasi:{s:"Pasien mengatakan sesak berkurang, lebih mudah bernapas.",o:"Frekuensi napas dalam rentang normal, SpO2 membaik, tidak tampak retraksi.",a:"Masalah Pola Napas Tidak Efektif teratasi sebagian.",p:"Lanjutkan monitoring pernapasan dan terapi oksigen sesuai kebutuhan, rujuk bila memburuk."},
+    penunjang:["Pulse oximetry (SpO2) — pemeriksaan cepat wajib","Rontgen toraks bila tersedia rujukan","Pemeriksaan fungsi paru (spirometri) untuk kasus kronik","EKG bila dicurigai penyebab kardiak"]
+  },
+  batuk:{
+    pengkajian:{
+      subjektif:["Durasi batuk, karakter (kering/berdahak), warna dahak","Adakah demam, sesak, atau nyeri dada penyerta","Riwayat merokok dan paparan polusi/TBC"],
+      objektif:["Auskultasi suara napas (ronkhi, mengi)","Karakteristik dahak bila ada","Tanda distres pernapasan"],
+      vital:["Frekuensi napas","Suhu tubuh (kemungkinan infeksi)","Saturasi oksigen"]
+    },
+    diagnosa:[
+      {kode:"D.0001",nama:"Bersihan Jalan Napas Tidak Efektif",def:"Ketidakmampuan membersihkan sekret/obstruksi jalan napas untuk mempertahankan jalan napas tetap paten."},
+      {kode:"D.0005",nama:"Pola Napas Tidak Efektif",def:"Inspirasi/ekspirasi tidak adekuat, dapat menyertai batuk produktif berat."}
+    ],
+    intervensi:[
+      {dx:"Bersihan Jalan Napas Tidak Efektif",observasi:["Monitor bunyi napas tambahan","Monitor karakteristik dan jumlah sputum"],terapeutik:["Berikan minum hangat","Lakukan fisioterapi dada bila perlu"],edukasi:["Ajarkan teknik batuk efektif","Anjurkan asupan cairan adekuat untuk mengencerkan dahak"],kolaborasi:["Kolaborasi pemberian mukolitik/ekspektoran sesuai indikasi"]}
+    ],
+    implementasi:["Mengajarkan dan mendampingi teknik batuk efektif","Menganjurkan minum air hangat secara rutin","Memantau karakteristik dahak dan pola napas","Memberikan obat sesuai instruksi dan memantau reaksi"],
+    evaluasi:{s:"Pasien mengatakan batuk berkurang, dahak lebih mudah keluar.",o:"Suara napas tambahan berkurang, frekuensi napas normal.",a:"Masalah Bersihan Jalan Napas Tidak Efektif teratasi sebagian.",p:"Lanjutkan edukasi batuk efektif dan pantau tanda perburukan (demam, sesak)."},
+    penunjang:["Pemeriksaan dahak (BTA/sputum) bila dicurigai TBC","Rontgen toraks bila batuk &gt;2 minggu atau ada tanda bahaya","Darah lengkap untuk menilai tanda infeksi"]
+  },
+  diare:{
+    pengkajian:{
+      subjektif:["Frekuensi dan konsistensi BAB, adanya darah/lendir","Sejak kapan, makanan/minuman yang dicurigai","Adanya mual, muntah, atau kram perut"],
+      objektif:["Tanda dehidrasi: mata cekung, turgor kulit, mukosa kering","Bising usus","Kondisi area perianal"],
+      vital:["Tekanan darah (waspada hipotensi akibat dehidrasi)","Nadi (takikardia bila dehidrasi)","Suhu tubuh"]
+    },
+    diagnosa:[
+      {kode:"D.0020",nama:"Diare",def:"Pengeluaran feses lunak/cair dengan frekuensi meningkat, dapat disertai kram perut."},
+      {kode:"D.0034",nama:"Risiko Hipovolemia",def:"Berisiko mengalami penurunan volume cairan intravaskular akibat kehilangan cairan berlebih."}
+    ],
+    intervensi:[
+      {dx:"Diare",observasi:["Identifikasi penyebab diare (makanan, infeksi, obat)","Monitor frekuensi dan konsistensi feses"],terapeutik:["Berikan cairan oral (oralit) sesuai kebutuhan","Jaga kebersihan area perianal"],edukasi:["Anjurkan menghindari makanan pemicu (pedas, berlemak)","Edukasi kebersihan makanan dan cuci tangan"],kolaborasi:["Kolaborasi pemberian antidiare/antibiotik sesuai indikasi medis"]},
+      {dx:"Risiko Hipovolemia",observasi:["Monitor tanda-tanda dehidrasi dan intake-output cairan"],terapeutik:["Berikan rehidrasi oral bertahap"],edukasi:["Anjurkan minum sedikit-sedikit tapi sering"],kolaborasi:["Kolaborasi pemberian cairan intravena bila dehidrasi sedang-berat"]}
+    ],
+    implementasi:["Memberikan dan memantau pemberian oralit","Mencatat frekuensi dan karakteristik BAB","Memantau tanda dehidrasi secara berkala","Mengedukasi kebersihan makanan dan cuci tangan"],
+    evaluasi:{s:"Pasien mengatakan BAB sudah mulai padat, frekuensi berkurang.",o:"Turgor kulit membaik, mukosa lembap, tidak ada tanda dehidrasi.",a:"Masalah Diare teratasi sebagian.",p:"Lanjutkan pemantauan intake-output dan edukasi pola makan."},
+    penunjang:["Pemeriksaan feses rutin (leukosit, darah samar, parasit)","Elektrolit darah bila dehidrasi sedang-berat","Kultur feses bila diare berkepanjangan atau berdarah"]
+  },
+  mual:{
+    pengkajian:{
+      subjektif:["Frekuensi mual/muntah, isi muntahan","Kaitan dengan makanan, obat, atau kehamilan","Adanya nyeri ulu hati penyerta"],
+      objektif:["Tanda dehidrasi akibat muntah berulang","Bising usus","Kondisi mukosa mulut"],
+      vital:["Tekanan darah dan nadi (waspada dehidrasi)","Berat badan bila muntah kronis"]
+    },
+    diagnosa:[
+      {kode:"D.0076",nama:"Nausea",def:"Perasaan tidak nyaman pada bagian belakang tenggorok/lambung yang dapat mengakibatkan muntah."},
+      {kode:"D.0019",nama:"Defisit Nutrisi",def:"Asupan nutrisi tidak cukup untuk memenuhi kebutuhan metabolisme akibat mual/muntah berkepanjangan."}
+    ],
+    intervensi:[
+      {dx:"Nausea",observasi:["Identifikasi faktor pencetus mual (makanan, bau, obat)","Monitor mual dan efek terhadap kualitas hidup"],terapeutik:["Kendalikan faktor lingkungan penyebab mual (bau, suara)","Berikan makanan dalam porsi kecil tapi sering"],edukasi:["Anjurkan istirahat dan tidur cukup","Ajarkan teknik napas dalam untuk menekan reflek mual"],kolaborasi:["Kolaborasi pemberian antiemetik sesuai indikasi"]},
+      {dx:"Defisit Nutrisi",observasi:["Monitor asupan makanan dan berat badan"],terapeutik:["Sajikan makanan hangat dan menarik dalam porsi kecil"],edukasi:["Anjurkan makan pelan-pelan dan hindari makanan berlemak"],kolaborasi:["Kolaborasi dengan ahli gizi bila diperlukan"]}
+    ],
+    implementasi:["Memberikan antiemetik sesuai instruksi dan memantau efektivitas","Menyajikan makanan porsi kecil dan sering","Memantau intake cairan dan tanda dehidrasi","Menciptakan lingkungan yang minim pencetus mual"],
+    evaluasi:{s:"Pasien mengatakan mual berkurang, sudah bisa makan sedikit-sedikit.",o:"Tidak ada episode muntah dalam 4 jam terakhir, intake oral membaik.",a:"Masalah Nausea teratasi sebagian.",p:"Lanjutkan pemantauan asupan makan dan cairan."},
+    penunjang:["Elektrolit darah bila muntah berulang","Tes kehamilan bila indikasi pada usia reproduktif","USG abdomen bila dicurigai penyebab organik"]
+  },
+  pusing:{
+    pengkajian:{
+      subjektif:["Karakter pusing (berputar/melayang), pemicu (perubahan posisi)","Riwayat hipertensi, anemia, atau gangguan telinga dalam","Adanya mual, tinnitus, atau gangguan pendengaran"],
+      objektif:["Keseimbangan dan gaya berjalan","Nistagmus bila ada","Tanda anemia (pucat, konjungtiva)"],
+      vital:["Tekanan darah (termasuk perubahan posisi/ortostatik)","Nadi","Gula darah sewaktu bila dicurigai hipoglikemia"]
+    },
+    diagnosa:[
+      {kode:"D.0054",nama:"Gangguan Mobilitas Fisik",def:"Keterbatasan gerak fisik akibat pusing/vertigo yang mengganggu keseimbangan."},
+      {kode:"D.0143",nama:"Risiko Jatuh",def:"Berisiko mengalami kerusakan fisik akibat terjatuh karena gangguan keseimbangan."}
+    ],
+    intervensi:[
+      {dx:"Risiko Jatuh",observasi:["Identifikasi faktor risiko jatuh (riwayat jatuh, gangguan keseimbangan)"],terapeutik:["Pastikan lingkungan bebas hambatan dan pencahayaan cukup","Dampingi pasien saat mobilisasi"],edukasi:["Anjurkan bangun perlahan dari posisi tidur/duduk","Edukasi keluarga untuk mendampingi aktivitas pasien"],kolaborasi:["Kolaborasi pemeriksaan lanjutan bila vertigo berulang"]}
+    ],
+    implementasi:["Mendampingi pasien saat berpindah posisi/berjalan","Mengajarkan teknik bangun perlahan (duduk dulu sebelum berdiri)","Memantau tekanan darah posisi berbaring dan berdiri","Memastikan lingkungan aman dari risiko jatuh"],
+    evaluasi:{s:"Pasien mengatakan pusing berkurang, lebih stabil saat berjalan.",o:"Tidak ada episode jatuh, keseimbangan membaik.",a:"Masalah Risiko Jatuh teratasi sebagian, tetap dalam pemantauan.",p:"Lanjutkan edukasi keselamatan dan pantau tekanan darah berkala."},
+    penunjang:["Pemeriksaan gula darah sewaktu","Darah lengkap untuk skrining anemia","Tes fungsi vestibular/rujukan THT bila vertigo berulang"]
+  },
+  hipertensi:{
+    pengkajian:{
+      subjektif:["Keluhan sakit kepala, tengkuk berat, atau tanpa gejala","Riwayat hipertensi, obat yang rutin dikonsumsi","Pola makan (garam), aktivitas fisik, kebiasaan merokok"],
+      objektif:["Pengukuran tekanan darah ulang (2 kali, posisi duduk tenang)","Tanda kerusakan organ target (edema, sesak)","Indeks massa tubuh"],
+      vital:["Tekanan darah — fokus utama, ukur dua lengan bila perlu","Nadi","Frekuensi napas"]
+    },
+    diagnosa:[
+      {kode:"D.0077",nama:"Nyeri Akut (sakit kepala)",def:"Nyeri kepala terkait peningkatan tekanan darah."},
+      {kode:"D.0111",nama:"Defisit Pengetahuan",def:"Ketiadaan/kurangnya informasi tentang pengelolaan hipertensi dan faktor risikonya."}
+    ],
+    intervensi:[
+      {dx:"Defisit Pengetahuan",observasi:["Identifikasi kesiapan dan kemampuan menerima informasi"],terapeutik:["Sediakan materi edukasi tentang hipertensi"],edukasi:["Jelaskan diet rendah garam dan pentingnya aktivitas fisik","Ajarkan cara memantau tekanan darah mandiri","Edukasi kepatuhan minum obat"],kolaborasi:["Kolaborasi dengan ahli gizi untuk pengaturan diet"]},
+      {dx:"Nyeri Akut (sakit kepala)",observasi:["Kaji karakteristik dan skala nyeri kepala"],terapeutik:["Anjurkan istirahat di lingkungan tenang"],edukasi:["Ajarkan teknik relaksasi"],kolaborasi:["Kolaborasi pemberian antihipertensi/analgesik sesuai indikasi"]}
+    ],
+    implementasi:["Mengukur tekanan darah secara berkala dan mencatat trennya","Memberikan edukasi diet rendah garam dan gaya hidup sehat","Mendampingi pasien belajar teknik relaksasi","Mengingatkan kepatuhan kontrol dan konsumsi obat rutin"],
+    evaluasi:{s:"Pasien mengatakan memahami cara mengatur pola makan dan pentingnya kontrol rutin.",o:"Tekanan darah menunjukkan tren membaik/stabil dalam target yang disepakati.",a:"Masalah Defisit Pengetahuan teratasi.",p:"Anjurkan kontrol rutin ke puskesmas dan pemantauan tekanan darah mandiri di rumah."},
+    penunjang:["Profil lipid dan gula darah untuk skrining faktor risiko","Fungsi ginjal (ureum, kreatinin)","EKG untuk menilai dampak pada jantung","Urinalisis (proteinuria)"]
+  },
+  luka:{
+    pengkajian:{
+      subjektif:["Penyebab luka, waktu kejadian","Riwayat diabetes atau gangguan penyembuhan luka","Rasa nyeri pada area luka"],
+      objektif:["Lokasi, ukuran, kedalaman, dan warna dasar luka","Tanda infeksi: kemerahan, pus, bau, hangat","Status imunisasi tetanus"],
+      vital:["Suhu tubuh (waspada infeksi)","Nadi dan tekanan darah bila luka luas/perdarahan"]
+    },
+    diagnosa:[
+      {kode:"D.0129",nama:"Gangguan Integritas Kulit/Jaringan",def:"Kerusakan kulit (epidermis/dermis) atau jaringan akibat trauma."},
+      {kode:"D.0142",nama:"Risiko Infeksi",def:"Berisiko mengalami peningkatan terserang organisme patogenik akibat kerusakan integritas kulit."}
+    ],
+    intervensi:[
+      {dx:"Gangguan Integritas Kulit/Jaringan",observasi:["Monitor karakteristik luka (warna, ukuran, cairan)"],terapeutik:["Lakukan perawatan luka dengan teknik aseptik","Bersihkan luka dengan cairan yang sesuai"],edukasi:["Anjurkan menjaga luka tetap bersih dan kering","Ajarkan tanda infeksi yang harus dilaporkan"],kolaborasi:["Kolaborasi pemberian antibiotik topikal/sistemik bila terindikasi"]},
+      {dx:"Risiko Infeksi",observasi:["Monitor tanda-tanda infeksi lokal dan sistemik"],terapeutik:["Pertahankan teknik steril saat perawatan luka"],edukasi:["Edukasi pentingnya imunisasi tetanus bila belum lengkap"],kolaborasi:["Kolaborasi pemberian antibiotik profilaksis sesuai indikasi"]}
+    ],
+    implementasi:["Melakukan perawatan luka dengan teknik steril sesuai jadwal","Mendokumentasikan perkembangan kondisi luka","Memberikan edukasi perawatan luka mandiri di rumah","Memantau tanda infeksi setiap kunjungan"],
+    evaluasi:{s:"Pasien mengatakan nyeri pada luka berkurang.",o:"Luka tampak bersih, tidak ada tanda infeksi, proses granulasi baik.",a:"Masalah Gangguan Integritas Kulit teratasi sebagian.",p:"Lanjutkan perawatan luka berkala dan edukasi perawatan mandiri."},
+    penunjang:["Pemeriksaan darah lengkap bila dicurigai infeksi sistemik","Kultur pus/luka bila tanda infeksi berat atau tidak membaik","Gula darah sewaktu (skrining diabetes yang mengganggu penyembuhan luka)"]
+  },
+  lemah:{
+    pengkajian:{
+      subjektif:["Sejak kapan lemas dirasakan, aktivitas yang terganggu","Riwayat penyakit kronis, pola makan dan istirahat","Adanya penurunan berat badan atau nafsu makan"],
+      objektif:["Kekuatan otot, kemampuan mobilisasi","Tanda anemia atau dehidrasi","Kemampuan melakukan aktivitas sehari-hari (ADL)"],
+      vital:["Tekanan darah dan nadi","Gula darah sewaktu bila dicurigai hipoglikemia","Suhu tubuh"]
+    },
+    diagnosa:[
+      {kode:"D.0056",nama:"Intoleransi Aktivitas",def:"Ketidakcukupan energi untuk melakukan aktivitas sehari-hari."},
+      {kode:"D.0054",nama:"Gangguan Mobilitas Fisik",def:"Keterbatasan gerak fisik mandiri akibat kelemahan."}
+    ],
+    intervensi:[
+      {dx:"Intoleransi Aktivitas",observasi:["Identifikasi gangguan fungsi tubuh yang mengakibatkan kelelahan","Monitor respons tubuh terhadap aktivitas"],terapeutik:["Bantu aktivitas bertahap sesuai toleransi","Sediakan lingkungan yang mendukung istirahat"],edukasi:["Anjurkan tirah baring/istirahat cukup","Ajarkan aktivitas fisik bertahap sesuai kemampuan"],kolaborasi:["Kolaborasi dengan gizi/fisioterapi bila diperlukan"]}
+    ],
+    implementasi:["Membantu pasien melakukan aktivitas ringan secara bertahap","Memantau tanda vital sebelum dan sesudah aktivitas","Menganjurkan pola istirahat dan nutrisi yang cukup","Mendampingi mobilisasi untuk mencegah risiko jatuh"],
+    evaluasi:{s:"Pasien mengatakan sudah lebih bertenaga dan mampu beraktivitas ringan.",o:"Pasien mampu melakukan ADL dengan bantuan minimal, tanda vital stabil selama aktivitas.",a:"Masalah Intoleransi Aktivitas teratasi sebagian.",p:"Lanjutkan latihan aktivitas bertahap dan evaluasi asupan nutrisi."},
+    penunjang:["Darah lengkap (skrining anemia)","Gula darah sewaktu","Elektrolit bila dicurigai gangguan keseimbangan cairan","Fungsi tiroid bila lemas kronis tanpa sebab jelas"]
+  }
+};
+
+function renderTop10(){
+  document.getElementById('top10-list').innerHTML =
+    top10Diagnosa.map(d => `<li><b>${d.dx}</b><span class="ket">${d.ket}</span></li>`).join('');
+}
+renderTop10();
+
+const pages = ['pengkajian','diagnosa','intervensi','implementasi','evaluasi','penunjang'];
+const selectedKasus = {};
+
+function renderChips(page){
+  document.getElementById('chips-'+page).innerHTML = kasusList.map(k =>
+    `<div class="chip" id="chip-${page}-${k.key}" onclick="selectKasus('${page}','${k.key}')">${k.icon} ${k.label}</div>`
+  ).join('');
+}
+pages.forEach(renderChips);
+
+function selectKasus(page, key){
+  selectedKasus[page] = key;
+  kasusList.forEach(k=>{
+    document.getElementById(`chip-${page}-${k.key}`).classList.toggle('active', k.key===key);
+  });
+  renderResult(page, key);
+}
+
+function renderResult(page, key){
+  const d = data[key];
+  const kasus = kasusList.find(k=>k.key===key);
+  const el = document.getElementById('result-'+page);
+  if(!d){ el.innerHTML = '<div class="empty-hint">Data belum tersedia untuk keluhan ini.</div>'; return; }
+
+  if(page==='pengkajian'){
+    el.innerHTML = `
+      <div class="res-card">
+        <h3>${kasus.icon} Fokus Pengkajian — ${kasus.label}</h3>
+        <div class="subhead">Data Subjektif (Anamnesis)</div>
+        <ul>${d.pengkajian.subjektif.map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead">Data Objektif (Pemeriksaan Fisik)</div>
+        <ul>${d.pengkajian.objektif.map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead">Fokus Tanda Vital</div>
+        <ul>${d.pengkajian.vital.map(i=>`<li>${i}</li>`).join('')}</ul>
+      </div>`;
+  }
+  else if(page==='diagnosa'){
+    el.innerHTML = d.diagnosa.map(dx=>`
+      <div class="res-card">
+        <h3><span class="kode">${dx.kode}</span> ${dx.nama}</h3>
+        <div class="def">${dx.def}</div>
+      </div>`).join('');
+  }
+  else if(page==='intervensi'){
+    el.innerHTML = d.intervensi.map(iv=>`
+      <div class="res-card">
+        <h3>🗂️ ${iv.dx}</h3>
+        <div class="subhead">Observasi</div><ul>${iv.observasi.map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead">Terapeutik</div><ul>${iv.terapeutik.map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead">Edukasi</div><ul>${iv.edukasi.map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead">Kolaborasi</div><ul>${iv.kolaborasi.map(i=>`<li>${i}</li>`).join('')}</ul>
+      </div>`).join('');
+  }
+  else if(page==='implementasi'){
+    el.innerHTML = `
+      <div class="res-card">
+        <h3>🩹 Contoh Implementasi — ${kasus.label}</h3>
+        <ul>${d.implementasi.map(i=>`<li>${i}</li>`).join('')}</ul>
+      </div>`;
+  }
+  else if(page==='evaluasi'){
+    el.innerHTML = `
+      <div class="res-card">
+        <h3>✅ Contoh Evaluasi (SOAP) — ${kasus.label}</h3>
+        <div class="subhead">S — Subjektif</div><ul><li>${d.evaluasi.s}</li></ul>
+        <div class="subhead">O — Objektif</div><ul><li>${d.evaluasi.o}</li></ul>
+        <div class="subhead">A — Analisis</div><ul><li>${d.evaluasi.a}</li></ul>
+        <div class="subhead">P — Perencanaan Lanjutan</div><ul><li>${d.evaluasi.p}</li></ul>
+      </div>`;
+  }
+  else if(page==='penunjang'){
+    el.innerHTML = `
+      <div class="res-card">
+        <h3>🧪 Rekomendasi Pemeriksaan Penunjang — ${kasus.label}</h3>
+        <div class="tag-row">${d.penunjang.map(i=>`<span class="tag-pill">${i}</span>`).join('')}</div>
+      </div>`;
+  }
+}
+</script>
+
+</body>
+</html>
