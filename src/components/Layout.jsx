@@ -34,11 +34,7 @@ export default function Layout({ children }) {
       <aside className="hidden lg:flex lg:flex-col w-64 bg-surface border-r border-border fixed inset-y-0 left-0 z-30">
         {/* Brand */}
         <div className="flex items-center gap-3 px-5 py-5 border-b border-border">
-          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-          </div>
+          <img src="/sarco-doc-logo.png" alt="SARCO-Vac" className="h-9 w-auto" />
           <div>
             <div className="text-sm font-bold text-foreground leading-tight">SARCO-Vac</div>
             <div className="text-[11px] text-foreground/50">Imunisasi Posyandu</div>
@@ -92,11 +88,7 @@ export default function Layout({ children }) {
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 inset-x-0 z-40 bg-surface border-b border-border px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-          </div>
+          <img src="/sarco-doc-logo.png" alt="SARCO-Vac" className="h-8 w-auto" />
           <span className="text-sm font-bold text-foreground">SARCO-Vac</span>
         </div>
         <button onClick={handleLogout} className="text-sm text-destructive font-medium cursor-pointer">Keluar</button>
