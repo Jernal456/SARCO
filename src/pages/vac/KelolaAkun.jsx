@@ -43,10 +43,10 @@ export default function KelolaAkun() {
     setLoading(false);
 
     if (error || data?.error) {
-      setMsg('❌ Gagal: ' + (data?.error || error.message));
+      setMsg('Gagal: ' + (data?.error || error.message));
       return;
     }
-    setMsg('✅ Akun berhasil dibuat.');
+    setMsg('Akun berhasil dibuat.');
     setForm({ username: '', password: '', role: 'petugas', nama_lengkap: '' });
     load();
   }
@@ -64,67 +64,143 @@ export default function KelolaAkun() {
     alert('Password berhasil direset.');
   }
 
+  const roleLabel = (r) => {
+    if (r === 'admin') return 'Admin';
+    if (r === 'kapus') return 'Kepala Puskesmas';
+    return 'Petugas';
+  };
+
   return (
-    <div style={s.wrap}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={s.title}>Kelola Akun</h2>
-        <Link to="/vac" style={s.backLink}>← Kembali ke Dashboard</Link>
+    <div className="max-w-4xl mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-lg font-bold text-foreground">Kelola Akun</h1>
+        <Link to="/vac" className="text-sm text-primary font-semibold hover:text-primary-dark transition-colors">
+          ← Kembali
+        </Link>
       </div>
 
-      <form style={s.card} onSubmit={handleTambah}>
-        <div style={s.subhead}>+ Tambah Akun Baru</div>
-        <div style={s.row}>
-          <input style={s.input} placeholder="Username" value={form.username}
-            onChange={e => setForm({ ...form, username: e.target.value })} />
-          <input style={s.input} placeholder="Password" type="text" value={form.password}
-            onChange={e => setForm({ ...form, password: e.target.value })} />
-          <select style={s.input} value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>
+      {/* Add Form */}
+      <form onSubmit={handleTambah} className="bg-surface rounded-xl border border-border p-5 shadow-sm mb-5">
+        <h3 className="text-xs font-bold text-foreground/50 uppercase tracking-wide mb-3">Tambah Akun Baru</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+          <input
+            type="text"
+            placeholder="Username"
+            value={form.username}
+            onChange={e => setForm({ ...form, username: e.target.value })}
+            className="px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors"
+          />
+          <input
+            type="text"
+            placeholder="Password"
+            value={form.password}
+            onChange={e => setForm({ ...form, password: e.target.value })}
+            className="px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors"
+          />
+          <select
+            value={form.role}
+            onChange={e => setForm({ ...form, role: e.target.value })}
+            className="px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors cursor-pointer"
+          >
             <option value="petugas">Petugas</option>
             <option value="admin">Admin</option>
             <option value="kapus">Kepala Puskesmas</option>
           </select>
-          <input style={s.input} placeholder="Nama Lengkap" value={form.nama_lengkap}
-            onChange={e => setForm({ ...form, nama_lengkap: e.target.value })} />
-          <button style={s.btn} type="submit" disabled={loading}>{loading ? 'Memproses...' : '+ Buat Akun'}</button>
+          <input
+            type="text"
+            placeholder="Nama Lengkap"
+            value={form.nama_lengkap}
+            onChange={e => setForm({ ...form, nama_lengkap: e.target.value })}
+            className="px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors"
+          />
         </div>
-        {msg && <div style={s.msg}>{msg}</div>}
+        <button
+          type="submit"
+          disabled={loading}
+          className="px-5 py-2.5 rounded-lg bg-primary text-on-primary text-sm font-bold hover:bg-primary-dark transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+        >
+          {loading ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Memproses...
+            </>
+          ) : (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Buat Akun
+            </>
+          )}
+        </button>
+
+        {msg && (
+          <div className={`mt-3 px-3 py-2 rounded-lg text-sm font-medium ${
+            msg.includes('Gagal')
+              ? 'bg-destructive/5 border border-destructive/20 text-destructive'
+              : 'bg-success-light border border-success/20 text-success'
+          }`}>
+            {msg}
+          </div>
+        )}
       </form>
 
-      <div style={s.card}>
-        <div style={s.subhead}>Daftar Akun</div>
-        <table style={s.table}>
-          <thead><tr><th style={s.th}>Username</th><th style={s.th}>Nama Lengkap</th><th style={s.th}>Role</th><th style={s.th}>Aksi</th></tr></thead>
-          <tbody>
-            {list.map(u => (
-              <tr key={u.id}>
-                <td style={s.td}>{u.username}</td>
-                <td style={s.td}>{u.nama_lengkap || '-'}</td>
-                <td style={s.td}>{u.role}</td>
-                <td style={s.td}>
-                  <button style={s.smallBtn} onClick={() => ubahNama(u)}>Edit Nama</button>
-                  <button style={s.smallBtn} onClick={() => handleResetPassword(u)}>Reset Password</button>
-                </td>
+      {/* Table */}
+      <div className="bg-surface rounded-xl border border-border shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="text-sm font-bold text-foreground">Daftar Akun</h3>
+          <p className="text-xs text-foreground/40 mt-0.5">{list.length} akun terdaftar</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left px-5 py-3 font-semibold text-foreground/70">Username</th>
+                <th className="text-left px-5 py-3 font-semibold text-foreground/70">Nama Lengkap</th>
+                <th className="text-center px-5 py-3 font-semibold text-foreground/70">Role</th>
+                <th className="text-right px-5 py-3 font-semibold text-foreground/70">Aksi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {list.map(u => (
+                <tr key={u.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors">
+                  <td className="px-5 py-3 font-medium text-foreground">{u.username}</td>
+                  <td className="px-5 py-3 text-foreground/60">{u.nama_lengkap || '-'}</td>
+                  <td className="px-5 py-3 text-center">
+                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
+                      u.role === 'admin' ? 'bg-primary/10 text-primary'
+                      : u.role === 'kapus' ? 'bg-accent/10 text-accent'
+                      : 'bg-muted text-foreground/60'
+                    }`}>
+                      {roleLabel(u.role)}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => ubahNama(u)}
+                        className="px-3 py-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-foreground hover:bg-muted transition-colors cursor-pointer"
+                      >
+                        Edit Nama
+                      </button>
+                      <button
+                        onClick={() => handleResetPassword(u)}
+                        className="px-3 py-1.5 rounded-lg border border-warning/30 text-warning bg-warning-light text-xs font-medium hover:bg-warning/10 transition-colors cursor-pointer"
+                      >
+                        Reset Password
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {list.length === 0 && (
+                <tr><td colSpan={4} className="px-5 py-10 text-center text-foreground/30 text-sm">Belum ada akun</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
-
-const s = {
-  wrap: { maxWidth: 900, margin: '0 auto', padding: '20px 16px' },
-  title: { color: '#0e2a3d' },
-  backLink: { fontSize: 12.5, color: '#0b5252', textDecoration: 'none', fontWeight: 600 },
-  card: { background: '#fff', border: '1px solid #e1efe6', borderRadius: 14, padding: 18, marginBottom: 18 },
-  subhead: { fontSize: 12, fontWeight: 800, color: '#0b5252', textTransform: 'uppercase', marginBottom: 12 },
-  row: { display: 'flex', gap: 10, flexWrap: 'wrap' },
-  input: { flex: 1, minWidth: 140, padding: '9px 10px', border: '1px solid #cfe3da', borderRadius: 8, fontSize: 13.5 },
-  btn: { background: 'linear-gradient(90deg,#0f6e6e,#2f8f4e)', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', fontWeight: 600, cursor: 'pointer' },
-  msg: { marginTop: 12, fontSize: 13, fontWeight: 600, color: '#0b5252' },
-  table: { width: '100%', borderCollapse: 'collapse', fontSize: 13 },
-  th: { textAlign: 'left', padding: '8px 10px', borderBottom: '2px solid #e1efe6' },
-  td: { padding: '8px 10px', borderBottom: '1px dashed #e1efe6' },
-  smallBtn: { background: '#eaf7ee', border: '1px solid #cfe3da', borderRadius: 6, padding: '4px 10px', fontSize: 11.5, cursor: 'pointer', marginRight: 6 },
-};

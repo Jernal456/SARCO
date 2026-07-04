@@ -36,52 +36,102 @@ export default function KelolaPosyandu() {
   }
 
   return (
-    <div style={s.wrap}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={s.title}>Kelola Data Posyandu</h2>
-        <Link to="/vac" style={s.backLink}>← Kembali ke Dashboard</Link>
+    <div className="max-w-4xl mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-lg font-bold text-foreground">Kelola Data Posyandu</h1>
+        <Link to="/vac" className="text-sm text-primary font-semibold hover:text-primary-dark transition-colors">
+          ← Kembali
+        </Link>
       </div>
 
-      <form style={s.card} onSubmit={tambah}>
-        <div style={s.row}>
-          <input style={s.input} placeholder="Nama Posyandu" value={nama} onChange={e => setNama(e.target.value)} />
-          <input style={s.input} placeholder="Nama Desa" value={desa} onChange={e => setDesa(e.target.value)} />
-          <button style={s.btn} type="submit">+ Tambah</button>
+      {/* Add Form */}
+      <form onSubmit={tambah} className="bg-surface rounded-xl border border-border p-5 shadow-sm mb-5">
+        <h3 className="text-xs font-bold text-foreground/50 uppercase tracking-wide mb-3">Tambah Posyandu</h3>
+        <div className="flex flex-wrap gap-3">
+          <input
+            type="text"
+            placeholder="Nama Posyandu"
+            value={nama}
+            onChange={e => setNama(e.target.value)}
+            className="flex-1 min-w-[180px] px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors"
+          />
+          <input
+            type="text"
+            placeholder="Nama Desa"
+            value={desa}
+            onChange={e => setDesa(e.target.value)}
+            className="flex-1 min-w-[180px] px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors"
+          />
+          <button
+            type="submit"
+            className="px-5 py-2.5 rounded-lg bg-primary text-on-primary text-sm font-bold hover:bg-primary-dark transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Tambah
+          </button>
         </div>
       </form>
 
-      <div style={s.card}>
-        <table style={s.table}>
-          <thead><tr><th style={s.th}>Posyandu</th><th style={s.th}>Desa</th><th style={s.th}>Status</th><th style={s.th}>Aksi</th></tr></thead>
-          <tbody>
-            {list.map(p => (
-              <tr key={p.id}>
-                <td style={s.td}>{p.nama_posyandu}</td>
-                <td style={s.td}>{p.desa}</td>
-                <td style={s.td}>{p.aktif ? '✅ Aktif' : '⛔ Nonaktif'}</td>
-                <td style={s.td}>
-                  <button style={s.smallBtn} onClick={() => editNama(p)}>Edit</button>
-                  <button style={s.smallBtn} onClick={() => toggleAktif(p)}>{p.aktif ? 'Nonaktifkan' : 'Aktifkan'}</button>
-                </td>
+      {/* Table */}
+      <div className="bg-surface rounded-xl border border-border shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="text-sm font-bold text-foreground">Daftar Posyandu</h3>
+          <p className="text-xs text-foreground/40 mt-0.5">{list.length} posyandu terdaftar</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left px-5 py-3 font-semibold text-foreground/70">Posyandu</th>
+                <th className="text-left px-5 py-3 font-semibold text-foreground/70">Desa</th>
+                <th className="text-center px-5 py-3 font-semibold text-foreground/70">Status</th>
+                <th className="text-right px-5 py-3 font-semibold text-foreground/70">Aksi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {list.map(p => (
+                <tr key={p.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors">
+                  <td className="px-5 py-3 font-medium text-foreground">{p.nama_posyandu}</td>
+                  <td className="px-5 py-3 text-foreground/60">{p.desa}</td>
+                  <td className="px-5 py-3 text-center">
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                      p.aktif ? 'bg-success-light text-success' : 'bg-destructive-light text-destructive'
+                    }`}>
+                      {p.aktif ? 'Aktif' : 'Nonaktif'}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => editNama(p)}
+                        className="px-3 py-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-foreground hover:bg-muted transition-colors cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => toggleAktif(p)}
+                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                          p.aktif
+                            ? 'border-warning/30 text-warning bg-warning-light hover:bg-warning/10'
+                            : 'border-success/30 text-success bg-success-light hover:bg-success/10'
+                        }`}
+                      >
+                        {p.aktif ? 'Nonaktifkan' : 'Aktifkan'}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {list.length === 0 && (
+                <tr><td colSpan={4} className="px-5 py-10 text-center text-foreground/30 text-sm">Belum ada data posyandu</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
-
-const s = {
-  wrap: { maxWidth: 800, margin: '0 auto', padding: '20px 16px' },
-  title: { color: '#0e2a3d' },
-  backLink: { fontSize: 12.5, color: '#0b5252', textDecoration: 'none', fontWeight: 600 },
-  card: { background: '#fff', border: '1px solid #e1efe6', borderRadius: 14, padding: 18, marginBottom: 18 },
-  row: { display: 'flex', gap: 10, flexWrap: 'wrap' },
-  input: { flex: 1, padding: '9px 10px', border: '1px solid #cfe3da', borderRadius: 8, fontSize: 13.5 },
-  btn: { background: 'linear-gradient(90deg,#0f6e6e,#2f8f4e)', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', fontWeight: 600, cursor: 'pointer' },
-  table: { width: '100%', borderCollapse: 'collapse', fontSize: 13 },
-  th: { textAlign: 'left', padding: '8px 10px', borderBottom: '2px solid #e1efe6' },
-  td: { padding: '8px 10px', borderBottom: '1px dashed #e1efe6' },
-  smallBtn: { background: '#eaf7ee', border: '1px solid #cfe3da', borderRadius: 6, padding: '4px 10px', fontSize: 11.5, cursor: 'pointer', marginRight: 6 },
-};

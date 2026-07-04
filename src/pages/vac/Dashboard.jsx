@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { supabase, ANTIGEN_LIST } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import * as XLSX from 'xlsx';
@@ -21,8 +20,28 @@ function prevYYYYMM(yyyyMm) {
   return d.toISOString().slice(0, 7);
 }
 
+function StatCard({ label, value, compare, icon }) {
+  const diff = compare !== undefined ? value - compare : null;
+  return (
+    <div className="bg-surface rounded-xl border border-border p-4 text-center shadow-sm">
+      <div className="w-9 h-9 rounded-lg bg-primary/10 mx-auto mb-2 flex items-center justify-center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+          <path d={icon} />
+        </svg>
+      </div>
+      <div className="text-2xl font-extrabold text-foreground">{value}</div>
+      <div className="text-[11px] text-foreground/50 mt-0.5">{label}</div>
+      {diff !== null && (
+        <div className={`text-[11px] font-semibold mt-1.5 ${diff >= 0 ? 'text-success' : 'text-destructive'}`}>
+          {diff >= 0 ? '▲' : '▼'} {Math.abs(diff)} vs bulan lalu
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Dashboard() {
-  const { profile, logout } = useAuth();
+  const { profile } = useAuth();
   const isAdmin = profile?.role === 'admin';
 
   const [bulan, setBulan] = useState(currentYYYYMM());
@@ -58,7 +77,6 @@ export default function Dashboard() {
       setAntigenBulan([]);
     }
 
-    // Cek notifikasi: H-7 sebelum akhir bulan & posyandu yang belum lapor bulan berjalan
     if (bulan === currentYYYYMM()) {
       const today = new Date();
       const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
@@ -135,125 +153,145 @@ export default function Dashboard() {
   const rekap = rekapPerPosyandu();
 
   return (
-    <div style={s.wrap}>
-      <div style={s.header}>
-        <div>🩺 <b>SARCO-Vac</b> — Dashboard {isAdmin ? 'Admin' : 'Kepala Puskesmas'}</div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          {isAdmin && (
-            <>
-              <Link to="/vac/kelola-posyandu" style={s.menuLink}>⚙ Kelola Posyandu</Link>
-              <Link to="/vac/kelola-akun" style={s.menuLink}>👤 Kelola Akun</Link>
-            </>
-          )}
-          <button style={s.logoutBtn} onClick={logout}>Keluar</button>
-        </div>
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      {/* Title */}
+      <div className="mb-6">
+        <h1 className="text-lg font-bold text-foreground">
+          Dashboard {isAdmin ? 'Admin' : 'Kepala Puskesmas'}
+        </h1>
       </div>
 
+      {/* Alert */}
       {belumLapor.length > 0 && (
-        <div style={s.alert}>
-          ⚠️ <b>{belumLapor.length} Posyandu belum lapor bulan ini:</b>{' '}
-          {belumLapor.map(p => p.nama_posyandu).join(', ')}
+        <div className="mb-5 px-4 py-3 rounded-xl bg-warning-light border border-warning/20 text-warning flex items-start gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <div className="text-sm font-medium">
+            <strong>{belumLapor.length} Posyandu belum lapor bulan ini:</strong>{' '}
+            {belumLapor.map(p => p.nama_posyandu).join(', ')}
+          </div>
         </div>
       )}
 
-      <div style={s.filterRow}>
-        <label style={s.label}>Pilih Bulan</label>
-        <input style={s.input} type="month" value={bulan} onChange={e => setBulan(e.target.value)} />
-        <button style={s.exportBtn} onClick={exportExcel}>⬇ Unduh Rekap Posyandu (Excel)</button>
-        <button style={s.exportBtn} onClick={exportAntigenExcel}>⬇ Unduh Rekap Antigen (Excel)</button>
+      {/* Filter + Export */}
+      <div className="flex flex-wrap items-end gap-3 mb-5">
+        <div>
+          <label className="block text-xs font-semibold text-foreground/70 mb-1">Pilih Bulan</label>
+          <input
+            type="month"
+            value={bulan}
+            onChange={e => setBulan(e.target.value)}
+            className="px-3 py-2 rounded-lg border border-border bg-surface text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors"
+          />
+        </div>
+        <button
+          onClick={exportExcel}
+          className="px-4 py-2 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary-dark transition-colors cursor-pointer flex items-center gap-1.5"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Rekap Posyandu
+        </button>
+        <button
+          onClick={exportAntigenExcel}
+          className="px-4 py-2 rounded-lg bg-accent text-on-primary text-sm font-semibold hover:bg-accent/90 transition-colors cursor-pointer flex items-center gap-1.5"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Rekap Antigen
+        </button>
       </div>
 
-      <div style={s.statRow}>
-        <Stat label="Total Sasaran Hadir" value={totalBulanIni.hadir} compare={totalBulanLalu.hadir} />
-        <Stat label="Total Tidak Hadir" value={totalBulanIni.tidakHadir} compare={totalBulanLalu.tidakHadir} />
-        <Stat label="Total Divaksin (semua antigen)" value={totalDivaksin} />
-        <Stat label="Posyandu Belum Lapor" value={rekap.filter(r => !r.sudahLapor).length} />
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <StatCard label="Total Sasaran Hadir" value={totalBulanIni.hadir} compare={totalBulanLalu.hadir} icon="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+        <StatCard label="Total Tidak Hadir" value={totalBulanIni.tidakHadir} compare={totalBulanLalu.tidakHadir} icon="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+        <StatCard label="Total Divaksin" value={totalDivaksin} icon="M22 12h-4l-3 9L9 3l-3 9H2" />
+        <StatCard label="Belum Lapor" value={rekap.filter(r => !r.sudahLapor).length} icon="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
       </div>
 
-      <div style={s.card}>
-        <div style={s.subhead}>Rekap per Posyandu — {bulan}</div>
-        <table style={s.table}>
-          <thead>
-            <tr>
-              <th style={s.th}>Posyandu</th>
-              <th style={s.th}>Desa</th>
-              <th style={s.th}>Hadir</th>
-              <th style={s.th}>Tidak Hadir</th>
-              <th style={s.th}>Total Divaksin</th>
-              <th style={s.th}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rekap.map(r => (
-              <tr key={r.nama}>
-                <td style={s.td}>{r.nama}</td>
-                <td style={s.td}>{r.desa}</td>
-                <td style={s.td}>{r.hadir}</td>
-                <td style={s.td}>{r.tidakHadir}</td>
-                <td style={s.td}>{r.totalVaksin}</td>
-                <td style={s.td}>{r.sudahLapor ? '✅ Sudah' : '⚠️ Belum'}</td>
+      {/* Rekap Posyandu Table */}
+      <div className="bg-surface rounded-xl border border-border shadow-sm mb-5 overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="text-sm font-bold text-foreground">Rekap per Posyandu</h3>
+          <p className="text-xs text-foreground/40 mt-0.5">{bulan}</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left px-5 py-3 font-semibold text-foreground/70">Posyandu</th>
+                <th className="text-left px-5 py-3 font-semibold text-foreground/70">Desa</th>
+                <th className="text-right px-5 py-3 font-semibold text-foreground/70">Hadir</th>
+                <th className="text-right px-5 py-3 font-semibold text-foreground/70">Tidak Hadir</th>
+                <th className="text-right px-5 py-3 font-semibold text-foreground/70">Divaksin</th>
+                <th className="text-center px-5 py-3 font-semibold text-foreground/70">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div style={s.card}>
-        <div style={s.subhead}>Rekap per Antigen — {bulan}</div>
-        <table style={s.table}>
-          <thead>
-            <tr><th style={s.th}>Antigen</th><th style={s.th}>Laki-laki</th><th style={s.th}>Perempuan</th><th style={s.th}>Total</th></tr>
-          </thead>
-          <tbody>
-            {ANTIGEN_LIST.map(a => {
-              const items = antigenBulan.filter(x => x.jenis_antigen === a);
-              const l = items.reduce((s, i) => s + i.jumlah_l, 0);
-              const p = items.reduce((s, i) => s + i.jumlah_p, 0);
-              return (
-                <tr key={a}>
-                  <td style={s.td}>{a}</td><td style={s.td}>{l}</td><td style={s.td}>{p}</td><td style={s.td}>{l + p}</td>
+            </thead>
+            <tbody>
+              {rekap.map(r => (
+                <tr key={r.nama} className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors">
+                  <td className="px-5 py-3 font-medium text-foreground">{r.nama}</td>
+                  <td className="px-5 py-3 text-foreground/60">{r.desa}</td>
+                  <td className="px-5 py-3 text-right text-foreground">{r.hadir}</td>
+                  <td className="px-5 py-3 text-right text-foreground">{r.tidakHadir}</td>
+                  <td className="px-5 py-3 text-right font-semibold text-foreground">{r.totalVaksin}</td>
+                  <td className="px-5 py-3 text-center">
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                      r.sudahLapor
+                        ? 'bg-success-light text-success'
+                        : 'bg-warning-light text-warning'
+                    }`}>
+                      {r.sudahLapor ? 'Sudah' : 'Belum'}
+                    </span>
+                  </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              ))}
+              {rekap.length === 0 && (
+                <tr><td colSpan={6} className="px-5 py-10 text-center text-foreground/30 text-sm">Tidak ada data posyandu</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Rekap Antigen Table */}
+      <div className="bg-surface rounded-xl border border-border shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="text-sm font-bold text-foreground">Rekap per Antigen</h3>
+          <p className="text-xs text-foreground/40 mt-0.5">{bulan}</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left px-5 py-3 font-semibold text-foreground/70">Antigen</th>
+                <th className="text-right px-5 py-3 font-semibold text-foreground/70">Laki-laki</th>
+                <th className="text-right px-5 py-3 font-semibold text-foreground/70">Perempuan</th>
+                <th className="text-right px-5 py-3 font-semibold text-foreground/70">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ANTIGEN_LIST.map(a => {
+                const items = antigenBulan.filter(x => x.jenis_antigen === a);
+                const l = items.reduce((s, i) => s + i.jumlah_l, 0);
+                const p = items.reduce((s, i) => s + i.jumlah_p, 0);
+                return (
+                  <tr key={a} className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors">
+                    <td className="px-5 py-3 font-medium text-foreground">{a}</td>
+                    <td className="px-5 py-3 text-right text-foreground/60">{l}</td>
+                    <td className="px-5 py-3 text-right text-foreground/60">{p}</td>
+                    <td className="px-5 py-3 text-right font-semibold text-foreground">{l + p}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
-
-function Stat({ label, value, compare }) {
-  const diff = compare !== undefined ? value - compare : null;
-  return (
-    <div style={s.statBox}>
-      <div style={s.statValue}>{value}</div>
-      <div style={s.statLabel}>{label}</div>
-      {diff !== null && (
-        <div style={{ fontSize: 11, color: diff >= 0 ? '#2f8f4e' : '#c0392b', marginTop: 4 }}>
-          {diff >= 0 ? '▲' : '▼'} {Math.abs(diff)} vs bulan lalu
-        </div>
-      )}
-    </div>
-  );
-}
-
-const s = {
-  wrap: { maxWidth: 1000, margin: '0 auto', padding: '20px 16px 60px', fontFamily: 'Segoe UI, sans-serif' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 4px', marginBottom: 16 },
-  logoutBtn: { background: '#eafff1', border: '1px solid #cfe3da', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', fontSize: 12.5 },
-  menuLink: { background: '#fff', border: '1px solid #cfe3da', borderRadius: 8, padding: '6px 14px', fontSize: 12.5, color: '#0b5252', textDecoration: 'none', fontWeight: 600 },
-  alert: { background: '#fff8e6', border: '1px solid #f0dca0', color: '#7a5c14', borderRadius: 10, padding: '12px 16px', marginBottom: 18, fontSize: 13.5 },
-  filterRow: { display: 'flex', gap: 12, alignItems: 'flex-end', marginBottom: 20, flexWrap: 'wrap' },
-  label: { fontSize: 12, fontWeight: 700, color: '#0b5252', display: 'block', marginBottom: 4 },
-  input: { padding: '8px 10px', border: '1px solid #cfe3da', borderRadius: 8, fontSize: 13 },
-  exportBtn: { background: 'linear-gradient(90deg,#0f6e6e,#2f8f4e)', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 14px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' },
-  statRow: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 },
-  statBox: { background: '#fff', border: '1px solid #e1efe6', borderRadius: 14, padding: 16, textAlign: 'center' },
-  statValue: { fontSize: 24, fontWeight: 800, color: '#0b5252' },
-  statLabel: { fontSize: 11.5, color: '#5b6b6b', marginTop: 2 },
-  card: { background: '#fff', border: '1px solid #e1efe6', borderRadius: 16, padding: 20, marginBottom: 20, overflowX: 'auto' },
-  subhead: { fontSize: 13, fontWeight: 800, color: '#0b5252', marginBottom: 12 },
-  table: { width: '100%', borderCollapse: 'collapse', fontSize: 13 },
-  th: { textAlign: 'left', padding: '8px 10px', borderBottom: '2px solid #e1efe6', color: '#0e2a3d' },
-  td: { padding: '8px 10px', borderBottom: '1px dashed #e1efe6' },
-};
