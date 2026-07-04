@@ -32,11 +32,7 @@ export default function Login() {
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-primary mx-auto mb-4 flex items-center justify-center shadow-lg shadow-primary/20">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-          </div>
+          <img src="/sarco-doc-logo.png" alt="SARCO-Vac" className="h-16 w-auto mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground">SARCO-Vac</h1>
           <p className="text-sm text-foreground/50 mt-1">Sistem Pelaporan Cakupan Imunisasi Posyandu</p>
         </div>
