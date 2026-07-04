@@ -1,21 +1,27 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const { loginWithUsername } = useAuth();
+  const { loginWithUsername, session, loading } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  // Kalau session sudah ada (misalnya setelah refresh halaman ini),
+  // langsung arahkan ke dashboard, jangan tampilkan form login lagi.
+  if (!loading && session) {
+    return <Navigate to="/vac" replace />;
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    setSubmitting(true);
     const { error } = await loginWithUsername(username, password);
-    setLoading(false);
+    setSubmitting(false);
     if (error) {
       setError('Username atau password salah.');
       return;
@@ -37,8 +43,8 @@ export default function Login() {
 
         {error && <div style={styles.error}>{error}</div>}
 
-        <button style={styles.btn} type="submit" disabled={loading}>
-          {loading ? 'Memproses...' : 'Masuk'}
+        <button style={styles.btn} type="submit" disabled={submitting}>
+          {submitting ? 'Memproses...' : 'Masuk'}
         </button>
       </form>
     </div>
