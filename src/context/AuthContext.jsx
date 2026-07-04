@@ -18,13 +18,19 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    console.log('[SARCO][Auth] init: mulai getSession()');
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('[SARCO][Auth] getSession() selesai:', { session, error });
       setSession(session);
       if (session?.user) loadProfile(session.user.id);
+      setLoading(false);
+    }).catch((err) => {
+      console.error('[SARCO][Auth] getSession() EXCEPTION:', err);
       setLoading(false);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('[SARCO][Auth] onAuthStateChange:', _event, session);
       setSession(session);
       if (session?.user) {
         loadProfile(session.user.id);
