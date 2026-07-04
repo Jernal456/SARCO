@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 
 export default function KelolaPosyandu() {
@@ -36,7 +37,10 @@ export default function KelolaPosyandu() {
 
   return (
     <div style={s.wrap}>
-      <h2 style={s.title}>Kelola Data Posyandu</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={s.title}>Kelola Data Posyandu</h2>
+        <Link to="/vac" style={s.backLink}>← Kembali ke Dashboard</Link>
+      </div>
 
       <form style={s.card} onSubmit={tambah}>
         <div style={s.row}>
@@ -71,6 +75,7 @@ export default function KelolaPosyandu() {
 const s = {
   wrap: { maxWidth: 800, margin: '0 auto', padding: '20px 16px' },
   title: { color: '#0e2a3d' },
+  backLink: { fontSize: 12.5, color: '#0b5252', textDecoration: 'none', fontWeight: 600 },
   card: { background: '#fff', border: '1px solid #e1efe6', borderRadius: 14, padding: 18, marginBottom: 18 },
   row: { display: 'flex', gap: 10, flexWrap: 'wrap' },
   input: { flex: 1, padding: '9px 10px', border: '1px solid #cfe3da', borderRadius: 8, fontSize: 13.5 },
