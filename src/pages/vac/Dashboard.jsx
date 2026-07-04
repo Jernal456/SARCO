@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase, ANTIGEN_LIST } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import * as XLSX from 'xlsx';
@@ -137,7 +138,15 @@ export default function Dashboard() {
     <div style={s.wrap}>
       <div style={s.header}>
         <div>🩺 <b>SARCO-Vac</b> — Dashboard {isAdmin ? 'Admin' : 'Kepala Puskesmas'}</div>
-        <button style={s.logoutBtn} onClick={logout}>Keluar</button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {isAdmin && (
+            <>
+              <Link to="/vac/kelola-posyandu" style={s.menuLink}>⚙ Kelola Posyandu</Link>
+              <Link to="/vac/kelola-akun" style={s.menuLink}>👤 Kelola Akun</Link>
+            </>
+          )}
+          <button style={s.logoutBtn} onClick={logout}>Keluar</button>
+        </div>
       </div>
 
       {belumLapor.length > 0 && (
@@ -232,6 +241,7 @@ const s = {
   wrap: { maxWidth: 1000, margin: '0 auto', padding: '20px 16px 60px', fontFamily: 'Segoe UI, sans-serif' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 4px', marginBottom: 16 },
   logoutBtn: { background: '#eafff1', border: '1px solid #cfe3da', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', fontSize: 12.5 },
+  menuLink: { background: '#fff', border: '1px solid #cfe3da', borderRadius: 8, padding: '6px 14px', fontSize: 12.5, color: '#0b5252', textDecoration: 'none', fontWeight: 600 },
   alert: { background: '#fff8e6', border: '1px solid #f0dca0', color: '#7a5c14', borderRadius: 10, padding: '12px 16px', marginBottom: 18, fontSize: 13.5 },
   filterRow: { display: 'flex', gap: 12, alignItems: 'flex-end', marginBottom: 20, flexWrap: 'wrap' },
   label: { fontSize: 12, fontWeight: 700, color: '#0b5252', display: 'block', marginBottom: 4 },
