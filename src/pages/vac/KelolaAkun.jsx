@@ -33,8 +33,12 @@ export default function KelolaAkun() {
       return;
     }
     setLoading(true);
-    const { data, error } = await supabase.functions.invoke('create-user', {
-      body: { ...form, requester_id: profile?.id },
+    const { data, error } = await supabase.rpc('create_account_no_email', {
+      p_username: form.username,
+      p_password: form.password,
+      p_role: form.role,
+      p_nama_lengkap: form.nama_lengkap,
+      p_requester_id: profile?.id,
     });
     setLoading(false);
 
