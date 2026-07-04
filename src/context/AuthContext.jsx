@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null); // { id, username, role, nama_lengkap }
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // true selama session ATAU profile masih dimuat
 
   async function loadProfile(userId) {
     const { data, error } = await supabase
@@ -15,27 +15,30 @@ export function AuthProvider({ children }) {
       .eq('id', userId)
       .single();
     if (!error) setProfile(data);
+    else console.error('[SARCO][Auth] loadProfile error:', error);
+    setLoading(false); // baru selesai loading setelah profile juga didapat
   }
 
   useEffect(() => {
-    console.log('[SARCO][Auth] init: mulai getSession()');
     supabase.auth.getSession().then(({ data: { session }, error }) => {
-      console.log('[SARCO][Auth] getSession() selesai:', { session, error });
       setSession(session);
-      if (session?.user) loadProfile(session.user.id);
-      setLoading(false);
+      if (session?.user) {
+        loadProfile(session.user.id); // loading akan di-set false di dalam loadProfile
+      } else {
+        setLoading(false); // tidak ada session -> langsung selesai loading
+      }
     }).catch((err) => {
       console.error('[SARCO][Auth] getSession() EXCEPTION:', err);
       setLoading(false);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('[SARCO][Auth] onAuthStateChange:', _event, session);
       setSession(session);
       if (session?.user) {
         loadProfile(session.user.id);
       } else {
         setProfile(null);
+        setLoading(false);
       }
     });
 
