@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-
-// CATATAN PENTING:
-// Pembuatan user baru (auth.users) idealnya dilakukan lewat Supabase Admin API
-// (butuh service_role key) yang TIDAK aman dijalankan di frontend.
-// Untuk produksi, buat sebuah Supabase Edge Function "create-user" yang
-// dipanggil dari sini, atau buat akun manual lewat Supabase Dashboard.
-// Komponen ini hanya menampilkan & mengelola data profil (users_app),
-// bukan membuat akun auth baru.
+import { useAuth } from '../../context/AuthContext';
 
 export default function KelolaAkun() {
+  const { profile } = useAuth();
   const [list, setList] = useState([]);
+  const [form, setForm] = useState({ username: '', password: '', role: 'petugas', nama_lengkap: '' });
+  const [msg, setMsg] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => { load(); }, []);
 
@@ -27,17 +24,66 @@ export default function KelolaAkun() {
     }
   }
 
+  async function handleTambah(e) {
+    e.preventDefault();
+    setMsg('');
+    if (!form.username || !form.password) {
+      setMsg('Username dan password wajib diisi.');
+      return;
+    }
+    setLoading(true);
+    const { data, error } = await supabase.functions.invoke('create-user', {
+      body: { ...form, requester_id: profile?.id },
+    });
+    setLoading(false);
+
+    if (error || data?.error) {
+      setMsg('❌ Gagal: ' + (data?.error || error.message));
+      return;
+    }
+    setMsg('✅ Akun berhasil dibuat.');
+    setForm({ username: '', password: '', role: 'petugas', nama_lengkap: '' });
+    load();
+  }
+
+  async function handleResetPassword(u) {
+    const newPass = prompt(`Password baru untuk "${u.username}":`);
+    if (!newPass) return;
+    const { data, error } = await supabase.functions.invoke('reset-password', {
+      body: { target_user_id: u.id, new_password: newPass, requester_id: profile?.id },
+    });
+    if (error || data?.error) {
+      alert('Gagal reset password: ' + (data?.error || error.message));
+      return;
+    }
+    alert('Password berhasil direset.');
+  }
+
   return (
     <div style={s.wrap}>
       <h2 style={s.title}>Kelola Akun</h2>
-      <div style={s.note}>
-        ℹ️ Untuk membuat akun baru (petugas/kapus/admin), gunakan Supabase Dashboard →
-        Authentication → Add User, lalu tambahkan baris di tabel <code>users_app</code>
-        dengan role yang sesuai. Fitur "buat akun" langsung dari sini memerlukan
-        Edge Function terpisah agar aman (tidak expose service key ke browser).
-      </div>
+
+      <form style={s.card} onSubmit={handleTambah}>
+        <div style={s.subhead}>+ Tambah Akun Baru</div>
+        <div style={s.row}>
+          <input style={s.input} placeholder="Username" value={form.username}
+            onChange={e => setForm({ ...form, username: e.target.value })} />
+          <input style={s.input} placeholder="Password" type="text" value={form.password}
+            onChange={e => setForm({ ...form, password: e.target.value })} />
+          <select style={s.input} value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>
+            <option value="petugas">Petugas</option>
+            <option value="admin">Admin</option>
+            <option value="kapus">Kepala Puskesmas</option>
+          </select>
+          <input style={s.input} placeholder="Nama Lengkap" value={form.nama_lengkap}
+            onChange={e => setForm({ ...form, nama_lengkap: e.target.value })} />
+          <button style={s.btn} type="submit" disabled={loading}>{loading ? 'Memproses...' : '+ Buat Akun'}</button>
+        </div>
+        {msg && <div style={s.msg}>{msg}</div>}
+      </form>
 
       <div style={s.card}>
+        <div style={s.subhead}>Daftar Akun</div>
         <table style={s.table}>
           <thead><tr><th style={s.th}>Username</th><th style={s.th}>Nama Lengkap</th><th style={s.th}>Role</th><th style={s.th}>Aksi</th></tr></thead>
           <tbody>
@@ -46,7 +92,10 @@ export default function KelolaAkun() {
                 <td style={s.td}>{u.username}</td>
                 <td style={s.td}>{u.nama_lengkap || '-'}</td>
                 <td style={s.td}>{u.role}</td>
-                <td style={s.td}><button style={s.smallBtn} onClick={() => ubahNama(u)}>Edit Nama</button></td>
+                <td style={s.td}>
+                  <button style={s.smallBtn} onClick={() => ubahNama(u)}>Edit Nama</button>
+                  <button style={s.smallBtn} onClick={() => handleResetPassword(u)}>Reset Password</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -57,12 +106,16 @@ export default function KelolaAkun() {
 }
 
 const s = {
-  wrap: { maxWidth: 800, margin: '0 auto', padding: '20px 16px' },
+  wrap: { maxWidth: 900, margin: '0 auto', padding: '20px 16px' },
   title: { color: '#0e2a3d' },
-  note: { background: '#fff8e6', border: '1px solid #f0dca0', color: '#7a5c14', borderRadius: 10, padding: '12px 16px', fontSize: 12.5, marginBottom: 18, lineHeight: 1.5 },
-  card: { background: '#fff', border: '1px solid #e1efe6', borderRadius: 14, padding: 18 },
+  card: { background: '#fff', border: '1px solid #e1efe6', borderRadius: 14, padding: 18, marginBottom: 18 },
+  subhead: { fontSize: 12, fontWeight: 800, color: '#0b5252', textTransform: 'uppercase', marginBottom: 12 },
+  row: { display: 'flex', gap: 10, flexWrap: 'wrap' },
+  input: { flex: 1, minWidth: 140, padding: '9px 10px', border: '1px solid #cfe3da', borderRadius: 8, fontSize: 13.5 },
+  btn: { background: 'linear-gradient(90deg,#0f6e6e,#2f8f4e)', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', fontWeight: 600, cursor: 'pointer' },
+  msg: { marginTop: 12, fontSize: 13, fontWeight: 600, color: '#0b5252' },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: 13 },
   th: { textAlign: 'left', padding: '8px 10px', borderBottom: '2px solid #e1efe6' },
   td: { padding: '8px 10px', borderBottom: '1px dashed #e1efe6' },
-  smallBtn: { background: '#eaf7ee', border: '1px solid #cfe3da', borderRadius: 6, padding: '4px 10px', fontSize: 11.5, cursor: 'pointer' },
+  smallBtn: { background: '#eaf7ee', border: '1px solid #cfe3da', borderRadius: 6, padding: '4px 10px', fontSize: 11.5, cursor: 'pointer', marginRight: 6 },
 };

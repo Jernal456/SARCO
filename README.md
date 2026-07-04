@@ -4,36 +4,70 @@ Satu project dengan dua modul, beda route:
 - `/doc` — SARCO-Doc (portal referensi asuhan keperawatan)
 - `/vac` — SARCO-Vac (sistem pelaporan cakupan imunisasi posyandu)
 
+Login memakai **username + password saja** (tanpa email sama sekali dari sisi pengguna).
+
 ---
 
 ## 1. Setup Supabase
 
 1. Buat project baru di [supabase.com](https://supabase.com).
 2. Buka **SQL Editor**, jalankan seluruh isi file `supabase/schema.sql`.
-   Ini akan membuat tabel `posyandu`, `users_app`, `laporan_posyandu`, `laporan_antigen`, `master_antigen`,
-   sekaligus mengisi 18 data posyandu awal dan mengaktifkan Row Level Security.
-3. Buka **Authentication → Users → Add User**, buat akun untuk:
-   - 1 akun **admin** (contoh email: `admin@sarcovac.local`, password bebas)
-   - 1 akun **kapus** (contoh email: `kapus@sarcovac.local`)
-   - 1 akun **petugas** bersama (contoh email: `petugas@sarcovac.local`)
+   Ini membuat tabel `posyandu`, `users_app`, `laporan_posyandu`, `laporan_antigen`,
+   `master_antigen`, mengisi 18 data posyandu awal, dan mengaktifkan Row Level Security.
 
-   > Aplikasi memakai **username**, bukan email, saat login. Di balik layar,
-   > username otomatis diubah jadi format email `username@sarcovac.local`
-   > agar tetap kompatibel dengan Supabase Auth. Jadi kalau mau username-nya
-   > `admin`, buat email `admin@sarcovac.local` di Supabase Auth.
+3. **Deploy 2 Edge Function** (untuk fitur tambah akun & reset password dari dalam aplikasi):
 
-4. Setelah akun dibuat, catat **User UID** masing-masing (terlihat di halaman Users),
-   lalu jalankan query berikut di SQL Editor untuk mengisi tabel `users_app`
-   (ganti `<uid>` dan `<nama>` sesuai):
-
-   ```sql
-   insert into users_app (id, username, role, nama_lengkap) values
-     ('<uid-admin>', 'admin', 'admin', 'Nama Admin'),
-     ('<uid-kapus>', 'kapus', 'kapus', 'Nama Kepala Puskesmas'),
-     ('<uid-petugas>', 'petugas', 'petugas', 'Akun Bersama Petugas Posyandu');
+   Install Supabase CLI kalau belum ada:
+   ```bash
+   npm install -g supabase
    ```
 
-5. Ambil **Project URL** dan **anon public key** dari Settings → API.
+   Login & hubungkan ke project:
+   ```bash
+   supabase login
+   supabase link --project-ref <project-ref-anda>
+   ```
+   (project-ref dilihat di URL dashboard: `https://supabase.com/dashboard/project/<project-ref>`)
+
+   Deploy kedua function:
+   ```bash
+   supabase functions deploy create-user
+   supabase functions deploy reset-password
+   ```
+
+   Edge Function ini otomatis punya akses ke `SUPABASE_SERVICE_ROLE_KEY` tanpa perlu
+   diset manual (disediakan otomatis oleh Supabase saat deploy).
+
+4. **Buat akun ADMIN pertama secara manual** (hanya sekali, sebagai "kunci pembuka").
+   Setelah admin pertama ini ada, semua akun berikutnya (admin lain/kapus/petugas)
+   bisa dibuat langsung dari halaman **Kelola Akun** di aplikasi — tidak perlu lagi
+   masuk ke Supabase Dashboard.
+
+   Cara buat admin pertama, dua opsi:
+
+   **Opsi A — lewat Dashboard:**
+   - Authentication → Users → Add User
+   - Email: `admin@sarcovac.local` (format wajib: `USERNAME@sarcovac.local`)
+   - Password: bebas, catat baik-baik
+   - Setelah dibuat, salin **UID**-nya
+   - Buka SQL Editor, jalankan:
+     ```sql
+     insert into users_app (id, username, role, nama_lengkap) values
+       ('PASTE-UID-DISINI', 'admin', 'admin', 'Nama Anda');
+     ```
+
+   **Opsi B — panggil Edge Function langsung via curl** (tanpa requester_id karena admin pertama):
+   ```bash
+   curl -X POST 'https://<project-ref>.supabase.co/functions/v1/create-user' \
+     -H 'Authorization: Bearer <anon-key>' \
+     -H 'Content-Type: application/json' \
+     -d '{"username":"admin","password":"PasswordAnda123","role":"admin","nama_lengkap":"Nama Anda"}'
+   ```
+
+   Setelah admin pertama ini bisa login, buat akun `kapus` dan `petugas` lewat
+   halaman **Kelola Akun** di aplikasi (tinggal isi username + password + role).
+
+5. Ambil **Project URL** dan **anon public key** dari Settings → API (untuk langkah 2 di bawah).
 
 ---
 
@@ -44,7 +78,7 @@ npm install
 cp .env.example .env
 ```
 
-Isi `.env` dengan URL & anon key dari Supabase:
+Isi `.env`:
 ```
 VITE_SUPABASE_URL=https://xxxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=xxxxxxxxxxxxxxxx
@@ -55,56 +89,48 @@ Jalankan lokal:
 npm run dev
 ```
 
-Buka `http://localhost:5173` → otomatis diarahkan ke `/vac` (login dulu).
-
 ---
 
-## 3. Halaman SARCO-Doc (`/doc`)
+## 3. Deploy ke Vercel
 
-Untuk saat ini, `/doc` menampilkan file statis `sarco-doc-static.html` yang sudah
-dibuat sebelumnya (portal referensi askep). Salin file HTML tersebut ke folder
-`public/sarco-doc-static.html` sebelum deploy, atau porting penuh ke komponen
-React kalau ingin dijadikan satu kesatuan dengan Vite build.
-
----
-
-## 4. Deploy ke Vercel
-
-1. Push folder ini ke GitHub repo.
-2. Di Vercel: **New Project** → import repo tersebut.
+1. Push folder ini ke GitHub repo (pastikan `vercel.json` ikut ter-push — ini WAJIB
+   supaya refresh halaman selain `/` tidak 404).
+2. Di Vercel: **New Project** → import repo.
 3. Framework preset: **Vite**.
-4. Tambahkan Environment Variables di Vercel (Settings → Environment Variables):
+4. Environment Variables (Settings → Environment Variables):
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
-5. Deploy.
+5. Deploy. Kalau env var baru ditambahkan setelah deploy pertama, klik **Redeploy** manual
+   (Vercel tidak auto-rebuild hanya karena env var berubah).
+
+---
+
+## 4. Cara Kerja Login Username-Only
+
+- Semua akun di Supabase Auth sebenarnya tetap punya "email", tapi formatnya
+  otomatis: `username@sarcovac.local` — pengguna **tidak pernah melihat atau
+  mengetik email ini**.
+- Saat Admin membuat akun baru lewat halaman **Kelola Akun**, mereka cukup isi
+  username + password + role + nama. Edge Function `create-user` yang mengurus
+  konversi ke email dummy di baliknya.
+- Saat login, pengguna ketik username + password. `AuthContext.jsx` yang
+  mengonversi otomatis jadi email dummy sebelum dikirim ke Supabase Auth.
 
 ---
 
 ## 5. Catatan Penting
 
-- **Akun petugas bersifat 1 akun bersama** untuk semua 18 posyandu (sesuai
-  kesepakatan). Karena itu, pembatasan "hanya boleh edit data posyandu sendiri"
-  **tidak dijamin di level database (RLS)**, melainkan hanya di level tampilan:
-  petugas memilih posyandu dulu di form, lalu riwayat & edit yang muncul
-  hanya untuk posyandu yang sedang dipilih. Ini cukup untuk mencegah salah
-  klik tidak sengaja, tapi secara teknis akun ini punya akses ke semua data.
-  Kalau suatu saat mau lebih ketat, solusinya adalah membuat akun terpisah
-  per posyandu (16 akun) — tinggal bilang kalau mau diubah ke arah itu.
-
-- **Kelola Akun** (`/vac/kelola-akun`) saat ini hanya bisa **mengedit nama**
-  user yang sudah ada. Membuat akun baru dari dalam aplikasi memerlukan
-  Supabase Edge Function terpisah (karena butuh service role key yang tidak
-  boleh ditaruh di frontend). Untuk sekarang, akun baru dibuat manual lewat
-  Supabase Dashboard, lalu didaftarkan ke tabel `users_app` seperti langkah
-  di atas.
-
-- **Notifikasi "belum lapor"** dihitung otomatis (realtime) setiap dashboard
-  dibuka, mulai H-7 sebelum akhir bulan berjalan — tanpa perlu tabel/cron
-  tambahan.
-
-- **Export Excel** sudah tersedia (rekap per posyandu & per antigen).
-  Export PDF belum diimplementasi di versi ini — bisa ditambahkan dengan
-  library seperti `jspdf` + `jspdf-autotable` pada iterasi berikutnya.
+- **Akun petugas** bisa dibuat 1 akun bersama untuk semua posyandu (sesuai
+  kesepakatan awal), atau kalau nanti ingin lebih ketat, tinggal buat akun
+  terpisah per posyandu lewat Kelola Akun — sistem sudah mendukung jumlah
+  akun petugas berapa pun.
+- **Reset password**: karena tidak ada email asli, reset dilakukan manual
+  oleh Admin lewat tombol "Reset Password" di halaman Kelola Akun (memanggil
+  Edge Function `reset-password`), bukan lewat email "lupa password".
+- **Notifikasi "belum lapor"** dihitung otomatis (realtime) tiap dashboard
+  dibuka, mulai H-7 sebelum akhir bulan.
+- **Export**: Excel sudah tersedia. PDF belum — bisa ditambahkan berikutnya
+  dengan `jspdf` + `jspdf-autotable` kalau dibutuhkan.
 
 ---
 
@@ -113,26 +139,28 @@ React kalau ingin dijadikan satu kesatuan dengan Vite build.
 ```
 sarco-doc/
 ├── index.html
+├── vercel.json          ← WAJIB untuk SPA routing di Vercel
 ├── package.json
 ├── vite.config.js
 ├── .env.example
 ├── supabase/
-│   └── schema.sql
+│   ├── schema.sql
+│   └── functions/
+│       ├── create-user/index.ts
+│       └── reset-password/index.ts
 ├── src/
 │   ├── main.jsx
 │   ├── App.jsx
-│   ├── lib/
-│   │   └── supabase.js
-│   ├── context/
-│   │   └── AuthContext.jsx
-│   ├── components/
-│   │   └── ProtectedRoute.jsx
+│   ├── lib/supabase.js
+│   ├── context/AuthContext.jsx
+│   ├── components/ProtectedRoute.jsx
 │   └── pages/
 │       ├── Login.jsx
-│       ├── doc/            (tempat porting SARCO-Doc ke React nanti)
 │       └── vac/
 │           ├── PetugasForm.jsx
 │           ├── Dashboard.jsx
 │           ├── KelolaPosyandu.jsx
 │           └── KelolaAkun.jsx
+└── public/
+    └── sarco-doc-static.html
 ```
