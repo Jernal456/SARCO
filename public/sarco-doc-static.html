@@ -182,6 +182,56 @@
 .alur-nav .btn-next{background:linear-gradient(90deg,var(--teal),var(--green));color:#fff;margin-left:auto;}
 .alur-nav .btn-next:hover{filter:brightness(1.08);}
 .alur-nav .btn-next:disabled{opacity:.5;cursor:default;filter:none;}
+.btn-primary{background:linear-gradient(90deg,var(--teal),var(--green));color:#fff;border:none;padding:12px 28px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;}
+.btn-primary:hover{filter:brightness(1.08);}
+.btn-secondary{background:var(--mint);color:var(--navy);border:1.5px solid var(--border);padding:12px 28px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;}
+.btn-secondary:hover{background:var(--border);}
+
+.chatbot-btn{
+  position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--teal),var(--green));color:#fff;border:none;
+  font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(15,110,110,.35);z-index:999;
+  transition:.15s;display:flex;align-items:center;justify-content:center;
+}
+.chatbot-btn:hover{transform:scale(1.08);}
+.chatbot-panel{
+  position:fixed;bottom:86px;right:24px;width:340px;max-height:460px;
+  background:#fff;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.18);
+  z-index:999;display:none;flex-direction:column;overflow:hidden;
+  animation:fade .25s ease;
+}
+.chatbot-panel.open{display:flex;}
+.chatbot-head{
+  background:linear-gradient(90deg,var(--teal-dark),var(--green));color:#fff;
+  padding:14px 18px;font-weight:700;font-size:14px;display:flex;justify-content:space-between;
+}
+.chatbot-head button{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;}
+.chatbot-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:200px;max-height:320px;}
+.chatbot-bubble{max-width:85%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;}
+.chatbot-bubble.user{background:var(--mint);color:var(--navy);align-self:flex-end;border-bottom-right-radius:4px;}
+.chatbot-bubble.ai{background:var(--lightgreen);color:var(--navy);align-self:flex-start;border-bottom-left-radius:4px;}
+.chatbot-bubble.ai strong{color:var(--teal-dark);}
+.chatbot-bubble .goto{color:var(--teal);font-weight:600;cursor:pointer;text-decoration:underline;font-size:12px;}
+.chatbot-input-wrap{display:flex;padding:10px 14px;border-top:1px solid var(--border);gap:8px;}
+.chatbot-input-wrap input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;}
+.chatbot-input-wrap input:focus{border-color:var(--teal);}
+.chatbot-input-wrap button{padding:9px 18px;background:linear-gradient(90deg,var(--teal),var(--green));color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;}
+
+.panduan-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--teal);cursor:pointer;font-weight:600;}
+.panduan-btn:hover{text-decoration:underline;}
+.panduan-content{display:none;background:var(--mint);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:8px;font-size:12.5px;line-height:1.6;}
+.panduan-content.open{display:block;}
+.panduan-content .subhead{font-size:11px;}
+
+.form-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:var(--navy);outline:none;transition:.15s;resize:vertical;}
+.form-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--lightgreen);}
+.form-field{margin-bottom:10px;}
+.form-field label{display:block;font-size:12px;font-weight:600;color:var(--teal-dark);margin-bottom:4px;}
+.keluhan-input{font-size:15px;padding:12px 14px;}
+.dx-row{display:flex;gap:8px;margin-bottom:6px;align-items:start;}
+.dx-row input{flex:1;}
+.dx-row button{background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:4px;}
+.add-row{color:var(--teal);cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px;margin-top:4px;}
 </style>
 </head>
 <body>
@@ -226,25 +276,20 @@
   <div class="page-banner"><h2>ASKEP</h2><p>Asuhan Keperawatan berurutan — pilih keluhan, lanjutkan tiap tahap dengan satu klik</p></div>
   <div class="content-wrap">
     <div class="alur-flow">
-      <div class="pasien-section">
-        <div class="pasien-header" onclick="togglePasien()">
-          <span id="pasien-icon">▾</span> Data Pasien <span id="pasien-summary" style="font-weight:400;font-size:12px;color:var(--gray);margin-left:4px;"></span>
-        </div>
-        <div class="pasien-form" id="pasien-form">
-          <input type="text" id="pasien-nama" placeholder="Nama Pasien" oninput="updatePasienBar()">
-          <input type="number" id="pasien-usia" placeholder="Usia" min="0" max="150" style="width:70px;" oninput="updatePasienBar()">
-          <select id="pasien-kelamin" onchange="updatePasienBar()" style="width:60px;">
-            <option value="">JK</option><option value="L">L</option><option value="P">P</option>
-          </select>
-          <input type="text" id="pasien-norm" placeholder="No Rekam Medis" style="width:130px;" oninput="updatePasienBar()">
-          <input type="text" id="pasien-riwayat" placeholder="Riwayat Penyakit (hipertensi, DM, asma, dll)" style="width:100%;" oninput="updatePasienBar()">
-        </div>
-      </div>
-      <div class="pasien-bar" id="pasien-bar"></div>
+
       <div id="alur-selector" class="selector-box">
-        <div class="label">PILIH KELUHAN UTAMA</div>
-        <input type="text" id="alur-search" placeholder="Cari keluhan..." oninput="filterAlurChips()" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--mint);color:var(--navy);outline:none;margin-bottom:12px;" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor=''">
-        <div class="chips" id="chips-alur"></div>
+        <div class="label">KELULUHAN UTAMA</div>
+        <div class="form-field">
+          <label>Keluhan Utama</label>
+          <input class="form-input keluhan-input" id="alur-keluhan" placeholder="Ketik keluhan pasien..." oninput="onKeluhanInput()">
+        </div>
+        <div class="form-field">
+          <label>Detail Keluhan / Riwayat Sekarang</label>
+          <textarea class="form-input" id="alur-detail" rows="3" placeholder="Deskripsikan keluhan secara lengkap..."></textarea>
+        </div>
+        <div style="font-size:12px;color:var(--gray);margin-top:6px;cursor:pointer;font-weight:600;" onclick="togglePanduan('alur')">📖 Lihat Panduan Keluhan</div>
+        <div class="panduan-content" id="panduan-alur"></div>
+        <div style="margin-top:20px;"><button class="btn-next" onclick="alurNext()" id="alur-start-btn" style="width:100%;padding:14px;font-size:15px;">Selanjutnya →</button></div>
       </div>
       <div id="alur-content" style="display:none">
         <div class="alur-step-indicator" id="alur-steps"></div>
@@ -367,6 +412,16 @@
   </div>
 </section>
 
+<button class="chatbot-btn" onclick="toggleChat()">💬</button>
+<div class="chatbot-panel" id="chat-panel">
+  <div class="chatbot-head"><span>💬 Tanya AI — SARCO-Doc</span><button onclick="toggleChat()">✕</button></div>
+  <div class="chatbot-msgs" id="chat-msgs"></div>
+  <div class="chatbot-input-wrap">
+    <input id="chat-input" placeholder="Tanya tentang penyakit..." onkeydown="chatKey(event)">
+    <button onclick="sendChat()">Kirim</button>
+  </div>
+</div>
+
 <footer>© SARCO-Doc — Portal Referensi Cepat Asuhan Keperawatan, Puskesmas Malata, NTT</footer>
 
 <script>
@@ -426,10 +481,24 @@ const kasusList = [
 const data = {
   demam:{
     pengkajian:{
-      subjektif:["Sejak kapan demam dirasakan, pola demam (naik-turun/terus-menerus)","Adakah menggigil, keringat berlebih, nyeri kepala","Riwayat bepergian, kontak dengan orang sakit, riwayat imunisasi"],
-      objektif:["Suhu tubuh (termometer), akral hangat/dingin","Warna kulit (kemerahan), kelembapan kulit","Tanda dehidrasi: mukosa bibir, turgor kulit"],
-      vital:["Suhu tubuh — fokus utama","Nadi (biasanya meningkat mengikuti suhu)","Tekanan darah dan frekuensi napas"]
+    subjektif:{
+      keluhanUtama:["Sejak kapan demam dirasakan, pola demam (naik-turun/terus-menerus)"],
+      riwayatSekarang:["Adakah menggigil, keringat berlebih, nyeri kepala","Riwayat bepergian, kontak dengan orang sakit, riwayat imunisasi"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Suhu tubuh — fokus utama","Nadi (biasanya meningkat mengikuti suhu)","Tekanan darah dan frekuensi napas"],
+      pemeriksaanFisik:["Suhu tubuh (termometer), akral hangat/dingin","Warna kulit (kemerahan), kelembapan kulit","Tanda dehidrasi: mukosa bibir, turgor kulit"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0130",nama:"Hipertermia",def:"Suhu tubuh meningkat di atas rentang normal akibat proses penyakit, infeksi, atau dehidrasi."},
       {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan kurang nyaman akibat gejala penyakit seperti demam, menggigil, dan lemas."}
@@ -444,10 +513,24 @@ const data = {
   },
   nyeri:{
     pengkajian:{
-      subjektif:["Kaji nyeri dengan PQRST (Provokes, Quality, Region, Severity, Time)","Skala nyeri 0–10","Riwayat nyeri sebelumnya dan obat yang sudah dikonsumsi"],
-      objektif:["Ekspresi wajah (meringis), posisi tubuh melindungi area nyeri","Perubahan tanda vital akibat nyeri","Area, luas, dan tanda peradangan lokal bila ada"],
-      vital:["Tekanan darah dan nadi (dapat meningkat saat nyeri hebat)","Frekuensi napas (dapat meningkat/dangkal)"]
+    subjektif:{
+      keluhanUtama:["Kaji nyeri dengan PQRST (Provokes, Quality, Region, Severity, Time)"],
+      riwayatSekarang:["Skala nyeri 0–10","Riwayat nyeri sebelumnya dan obat yang sudah dikonsumsi"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah dan nadi (dapat meningkat saat nyeri hebat)","Frekuensi napas (dapat meningkat/dangkal)"],
+      pemeriksaanFisik:["Ekspresi wajah (meringis), posisi tubuh melindungi area nyeri","Perubahan tanda vital akibat nyeri","Area, luas, dan tanda peradangan lokal bila ada"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut",def:"Pengalaman sensorik/emosional tidak menyenangkan akibat kerusakan jaringan aktual atau potensial, berlangsung kurang dari 3 bulan."},
       {kode:"D.0056",nama:"Intoleransi Aktivitas",def:"Ketidakcukupan energi untuk melakukan aktivitas sehari-hari akibat nyeri atau kondisi fisik."}
@@ -462,10 +545,24 @@ const data = {
   },
   sesak:{
     pengkajian:{
-      subjektif:["Sejak kapan sesak dirasakan, faktor pemicu dan pereda","Riwayat asma, PPOK, atau penyakit jantung sebelumnya","Kemampuan bicara dalam kalimat penuh/terputus"],
-      objektif:["Penggunaan otot bantu napas, retraksi dinding dada","Warna kulit/bibir (sianosis)","Suara napas tambahan (wheezing, ronkhi)"],
-      vital:["Frekuensi dan pola napas — fokus utama","Saturasi oksigen (SpO2)","Nadi dan tekanan darah"]
+    subjektif:{
+      keluhanUtama:["Sejak kapan sesak dirasakan, faktor pemicu dan pereda"],
+      riwayatSekarang:["Riwayat asma, PPOK, atau penyakit jantung sebelumnya","Kemampuan bicara dalam kalimat penuh/terputus"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Frekuensi dan pola napas — fokus utama","Saturasi oksigen (SpO2)","Nadi dan tekanan darah"],
+      pemeriksaanFisik:["Penggunaan otot bantu napas, retraksi dinding dada","Warna kulit/bibir (sianosis)","Suara napas tambahan (wheezing, ronkhi)"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0005",nama:"Pola Napas Tidak Efektif",def:"Inspirasi/ekspirasi yang tidak memberikan ventilasi adekuat akibat hambatan upaya napas."},
       {kode:"D.0003",nama:"Gangguan Pertukaran Gas",def:"Kelebihan atau kekurangan oksigenasi/eliminasi karbondioksida pada membran alveolus-kapiler."}
@@ -480,10 +577,24 @@ const data = {
   },
   batuk:{
     pengkajian:{
-      subjektif:["Durasi batuk, karakter (kering/berdahak), warna dahak","Adakah demam, sesak, atau nyeri dada penyerta","Riwayat merokok dan paparan polusi/TBC"],
-      objektif:["Auskultasi suara napas (ronkhi, mengi)","Karakteristik dahak bila ada","Tanda distres pernapasan"],
-      vital:["Frekuensi napas","Suhu tubuh (kemungkinan infeksi)","Saturasi oksigen"]
+    subjektif:{
+      keluhanUtama:["Durasi batuk, karakter (kering/berdahak), warna dahak"],
+      riwayatSekarang:["Adakah demam, sesak, atau nyeri dada penyerta","Riwayat merokok dan paparan polusi/TBC"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Frekuensi napas","Suhu tubuh (kemungkinan infeksi)","Saturasi oksigen"],
+      pemeriksaanFisik:["Auskultasi suara napas (ronkhi, mengi)","Karakteristik dahak bila ada","Tanda distres pernapasan"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0001",nama:"Bersihan Jalan Napas Tidak Efektif",def:"Ketidakmampuan membersihkan sekret/obstruksi jalan napas untuk mempertahankan jalan napas tetap paten."},
       {kode:"D.0005",nama:"Pola Napas Tidak Efektif",def:"Inspirasi/ekspirasi tidak adekuat, dapat menyertai batuk produktif berat."}
@@ -497,10 +608,24 @@ const data = {
   },
   diare:{
     pengkajian:{
-      subjektif:["Frekuensi dan konsistensi BAB, adanya darah/lendir","Sejak kapan, makanan/minuman yang dicurigai","Adanya mual, muntah, atau kram perut"],
-      objektif:["Tanda dehidrasi: mata cekung, turgor kulit, mukosa kering","Bising usus","Kondisi area perianal"],
-      vital:["Tekanan darah (waspada hipotensi akibat dehidrasi)","Nadi (takikardia bila dehidrasi)","Suhu tubuh"]
+    subjektif:{
+      keluhanUtama:["Frekuensi dan konsistensi BAB, adanya darah/lendir"],
+      riwayatSekarang:["Sejak kapan, makanan/minuman yang dicurigai","Adanya mual, muntah, atau kram perut"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah (waspada hipotensi akibat dehidrasi)","Nadi (takikardia bila dehidrasi)","Suhu tubuh"],
+      pemeriksaanFisik:["Tanda dehidrasi: mata cekung, turgor kulit, mukosa kering","Bising usus","Kondisi area perianal"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0020",nama:"Diare",def:"Pengeluaran feses lunak/cair dengan frekuensi meningkat, dapat disertai kram perut."},
       {kode:"D.0034",nama:"Risiko Hipovolemia",def:"Berisiko mengalami penurunan volume cairan intravaskular akibat kehilangan cairan berlebih."}
@@ -515,10 +640,24 @@ const data = {
   },
   mual:{
     pengkajian:{
-      subjektif:["Frekuensi mual/muntah, isi muntahan","Kaitan dengan makanan, obat, atau kehamilan","Adanya nyeri ulu hati penyerta"],
-      objektif:["Tanda dehidrasi akibat muntah berulang","Bising usus","Kondisi mukosa mulut"],
-      vital:["Tekanan darah dan nadi (waspada dehidrasi)","Berat badan bila muntah kronis"]
+    subjektif:{
+      keluhanUtama:["Frekuensi mual/muntah, isi muntahan"],
+      riwayatSekarang:["Kaitan dengan makanan, obat, atau kehamilan","Adanya nyeri ulu hati penyerta"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah dan nadi (waspada dehidrasi)","Berat badan bila muntah kronis"],
+      pemeriksaanFisik:["Tanda dehidrasi akibat muntah berulang","Bising usus","Kondisi mukosa mulut"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0076",nama:"Nausea",def:"Perasaan tidak nyaman pada bagian belakang tenggorok/lambung yang dapat mengakibatkan muntah."},
       {kode:"D.0019",nama:"Defisit Nutrisi",def:"Asupan nutrisi tidak cukup untuk memenuhi kebutuhan metabolisme akibat mual/muntah berkepanjangan."}
@@ -533,10 +672,24 @@ const data = {
   },
   pusing:{
     pengkajian:{
-      subjektif:["Karakter pusing (berputar/melayang), pemicu (perubahan posisi)","Riwayat hipertensi, anemia, atau gangguan telinga dalam","Adanya mual, tinnitus, atau gangguan pendengaran"],
-      objektif:["Keseimbangan dan gaya berjalan","Nistagmus bila ada","Tanda anemia (pucat, konjungtiva)"],
-      vital:["Tekanan darah (termasuk perubahan posisi/ortostatik)","Nadi","Gula darah sewaktu bila dicurigai hipoglikemia"]
+    subjektif:{
+      keluhanUtama:["Karakter pusing (berputar/melayang), pemicu (perubahan posisi)"],
+      riwayatSekarang:["Riwayat hipertensi, anemia, atau gangguan telinga dalam","Adanya mual, tinnitus, atau gangguan pendengaran"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah (termasuk perubahan posisi/ortostatik)","Nadi","Gula darah sewaktu bila dicurigai hipoglikemia"],
+      pemeriksaanFisik:["Keseimbangan dan gaya berjalan","Nistagmus bila ada","Tanda anemia (pucat, konjungtiva)"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0054",nama:"Gangguan Mobilitas Fisik",def:"Keterbatasan gerak fisik akibat pusing/vertigo yang mengganggu keseimbangan."},
       {kode:"D.0143",nama:"Risiko Jatuh",def:"Berisiko mengalami kerusakan fisik akibat terjatuh karena gangguan keseimbangan."}
@@ -550,10 +703,24 @@ const data = {
   },
   hipertensi:{
     pengkajian:{
-      subjektif:["Keluhan sakit kepala, tengkuk berat, atau tanpa gejala","Riwayat hipertensi, obat yang rutin dikonsumsi","Pola makan (garam), aktivitas fisik, kebiasaan merokok"],
-      objektif:["Pengukuran tekanan darah ulang (2 kali, posisi duduk tenang)","Tanda kerusakan organ target (edema, sesak)","Indeks massa tubuh"],
-      vital:["Tekanan darah — fokus utama, ukur dua lengan bila perlu","Nadi","Frekuensi napas"]
+    subjektif:{
+      keluhanUtama:["Keluhan sakit kepala, tengkuk berat, atau tanpa gejala"],
+      riwayatSekarang:["Riwayat hipertensi, obat yang rutin dikonsumsi","Pola makan (garam), aktivitas fisik, kebiasaan merokok"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah — fokus utama, ukur dua lengan bila perlu","Nadi","Frekuensi napas"],
+      pemeriksaanFisik:["Pengukuran tekanan darah ulang (2 kali, posisi duduk tenang)","Tanda kerusakan organ target (edema, sesak)","Indeks massa tubuh"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut (sakit kepala)",def:"Nyeri kepala terkait peningkatan tekanan darah."},
       {kode:"D.0111",nama:"Defisit Pengetahuan",def:"Ketiadaan/kurangnya informasi tentang pengelolaan hipertensi dan faktor risikonya."}
@@ -568,10 +735,24 @@ const data = {
   },
   luka:{
     pengkajian:{
-      subjektif:["Penyebab luka, waktu kejadian","Riwayat diabetes atau gangguan penyembuhan luka","Rasa nyeri pada area luka"],
-      objektif:["Lokasi, ukuran, kedalaman, dan warna dasar luka","Tanda infeksi: kemerahan, pus, bau, hangat","Status imunisasi tetanus"],
-      vital:["Suhu tubuh (waspada infeksi)","Nadi dan tekanan darah bila luka luas/perdarahan"]
+    subjektif:{
+      keluhanUtama:["Penyebab luka, waktu kejadian"],
+      riwayatSekarang:["Riwayat diabetes atau gangguan penyembuhan luka","Rasa nyeri pada area luka"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Suhu tubuh (waspada infeksi)","Nadi dan tekanan darah bila luka luas/perdarahan"],
+      pemeriksaanFisik:["Lokasi, ukuran, kedalaman, dan warna dasar luka","Tanda infeksi: kemerahan, pus, bau, hangat","Status imunisasi tetanus"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0129",nama:"Gangguan Integritas Kulit/Jaringan",def:"Kerusakan kulit (epidermis/dermis) atau jaringan akibat trauma."},
       {kode:"D.0142",nama:"Risiko Infeksi",def:"Berisiko mengalami peningkatan terserang organisme patogenik akibat kerusakan integritas kulit."}
@@ -586,10 +767,24 @@ const data = {
   },
   lemah:{
     pengkajian:{
-      subjektif:["Sejak kapan lemas dirasakan, aktivitas yang terganggu","Riwayat penyakit kronis, pola makan dan istirahat","Adanya penurunan berat badan atau nafsu makan"],
-      objektif:["Kekuatan otot, kemampuan mobilisasi","Tanda anemia atau dehidrasi","Kemampuan melakukan aktivitas sehari-hari (ADL)"],
-      vital:["Tekanan darah dan nadi","Gula darah sewaktu bila dicurigai hipoglikemia","Suhu tubuh"]
+    subjektif:{
+      keluhanUtama:["Sejak kapan lemas dirasakan, aktivitas yang terganggu"],
+      riwayatSekarang:["Riwayat penyakit kronis, pola makan dan istirahat","Adanya penurunan berat badan atau nafsu makan"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah dan nadi","Gula darah sewaktu bila dicurigai hipoglikemia","Suhu tubuh"],
+      pemeriksaanFisik:["Kekuatan otot, kemampuan mobilisasi","Tanda anemia atau dehidrasi","Kemampuan melakukan aktivitas sehari-hari (ADL)"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0056",nama:"Intoleransi Aktivitas",def:"Ketidakcukupan energi untuk melakukan aktivitas sehari-hari."},
       {kode:"D.0054",nama:"Gangguan Mobilitas Fisik",def:"Keterbatasan gerak fisik mandiri akibat kelemahan."}
@@ -604,10 +799,24 @@ const data = {
 
   sakit_kepala:{
     pengkajian:{
-      subjektif:["Lokasi nyeri kepala (frontal/temporal/oksipital/whole head)","Karakter nyeri (tumpul/berdenyut/tegang), skala nyeri","Pemicu (stres, kurang tidur, cahaya terang, suara bising)","Riwayat migrain, sinusitis, atau hipertensi"],
-      objektif:["Ekspresi wajah menyeringai/tegang","Pemeriksaan tekanan darah","Palpasi otot leher dan bahu","Tanda rangsang meningeal (bila curiga infeksi SSP)"],
-      vital:["Tekanan darah — fokus utama","Nadi","Suhu tubuh (bila curiga infeksi)"]
+    subjektif:{
+      keluhanUtama:["Lokasi nyeri kepala (frontal/temporal/oksipital/whole head)"],
+      riwayatSekarang:["Karakter nyeri (tumpul/berdenyut/tegang), skala nyeri","Pemicu (stres, kurang tidur, cahaya terang, suara bising)","Riwayat migrain, sinusitis, atau hipertensi"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah — fokus utama","Nadi","Suhu tubuh (bila curiga infeksi)"],
+      pemeriksaanFisik:["Ekspresi wajah menyeringai/tegang","Pemeriksaan tekanan darah","Palpasi otot leher dan bahu","Tanda rangsang meningeal (bila curiga infeksi SSP)"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut",def:"Pengalaman sensorik/emosional tidak menyenangkan pada area kepala akibat berbagai pemicu (ketegangan, vaskuler, atau tekanan darah tinggi)."},
       {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan tidak nyaman akibat nyeri kepala yang mengganggu aktivitas dan istirahat."},
@@ -624,10 +833,24 @@ const data = {
 
   nyeri_tenggorokan:{
     pengkajian:{
-      subjektif:["Nyeri saat menelan, sejak kapan dirasakan","Adanya demam, suara serak, atau batuk penyerta","Riwayat ISPA berulang, merokok, atau paparan polusi"],
-      objektif:["Tampilan faring dan tonsil (kemerahan, pembengkakan, eksudat)","Pembesaran kelenjar getah bening leher","Suhu tubuh (demam)"],
-      vital:["Suhu tubuh — fokus utama","Frekuensi napas","Nadi"]
+    subjektif:{
+      keluhanUtama:["Nyeri saat menelan, sejak kapan dirasakan"],
+      riwayatSekarang:["Adanya demam, suara serak, atau batuk penyerta","Riwayat ISPA berulang, merokok, atau paparan polusi"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Suhu tubuh — fokus utama","Frekuensi napas","Nadi"],
+      pemeriksaanFisik:["Tampilan faring dan tonsil (kemerahan, pembengkakan, eksudat)","Pembesaran kelenjar getah bening leher","Suhu tubuh (demam)"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut",def:"Nyeri pada tenggorokan yang diperberat saat menelan akibat proses inflamasi pada faring/tonsil."},
       {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan tidak nyaman di tenggorokan (kering, gatal, panas) akibat iritasi mukosa faring."},
@@ -644,10 +867,24 @@ const data = {
 
   nyeri_pinggang:{
     pengkajian:{
-      subjektif:["Lokasi nyeri (pinggang bawah/tengah), onset (mendadak/bertahap)","Faktor pemicu (angkat berat, gerakan tiba-tiba, posisi lama)","Apakah nyeri menjalar ke tungkai/bokong","Riwayat cedera pinggang sebelumnya atau pekerjaan fisik berat"],
-      objektif:["Palpasi otot paravertebral (nyeri tekan, spasme)","Uji Laseque untuk skrining radikulopati","Kekuatan otot tungkai dan postur tubuh","Keterbatasan gerak fleksi/ekstensi lumbar"],
-      vital:["Tekanan darah","Nadi","Suhu tubuh (bila curiga infeksi)"]
+    subjektif:{
+      keluhanUtama:["Lokasi nyeri (pinggang bawah/tengah), onset (mendadak/bertahap)"],
+      riwayatSekarang:["Faktor pemicu (angkat berat, gerakan tiba-tiba, posisi lama)","Apakah nyeri menjalar ke tungkai/bokong","Riwayat cedera pinggang sebelumnya atau pekerjaan fisik berat"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah","Nadi","Suhu tubuh (bila curiga infeksi)"],
+      pemeriksaanFisik:["Palpasi otot paravertebral (nyeri tekan, spasme)","Uji Laseque untuk skrining radikulopati","Kekuatan otot tungkai dan postur tubuh","Keterbatasan gerak fleksi/ekstensi lumbar"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut",def:"Nyeri pada area pinggang akibat spasme otot, gangguan muskuloskeletal, atau iritasi saraf."},
       {kode:"D.0054",nama:"Gangguan Mobilitas Fisik",def:"Keterbatasan gerak fisik akibat nyeri pinggang yang mengganggu aktivitas duduk, berdiri, dan berjalan."},
@@ -664,10 +901,24 @@ const data = {
 
   dispepsia:{
     pengkajian:{
-      subjektif:["Nyeri ulu hati atau rasa terbakar di epigastrium","Mual, kembung, sendawa berlebih","Kaitan dengan makanan (sebelum/sesudah makan, jenis makanan pemicu)","Riwayat maag, GERD, atau tukak peptik"],
-      objektif:["Palpasi epigastrium (nyeri tekan)","Bising usus","Tanda dehidrasi bila disertai muntah berulang","Mukosa mulut dan bau mulut"],
-      vital:["Tekanan darah","Nadi","Suhu tubuh"]
+    subjektif:{
+      keluhanUtama:["Nyeri ulu hati atau rasa terbakar di epigastrium"],
+      riwayatSekarang:["Mual, kembung, sendawa berlebih","Kaitan dengan makanan (sebelum/sesudah makan, jenis makanan pemicu)","Riwayat maag, GERD, atau tukak peptik"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah","Nadi","Suhu tubuh"],
+      pemeriksaanFisik:["Palpasi epigastrium (nyeri tekan)","Bising usus","Tanda dehidrasi bila disertai muntah berulang","Mukosa mulut dan bau mulut"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut",def:"Nyeri pada daerah epigastrium akibat iritasi mukosa lambung, hiperasiditas, atau gangguan motilitas."},
       {kode:"D.0076",nama:"Nausea",def:"Perasaan tidak nyaman pada lambung yang dapat mengakibatkan muntah, terkait dengan gangguan fungsi gastrointestinal."},
@@ -684,10 +935,24 @@ const data = {
 
   mata_merah:{
     pengkajian:{
-      subjektif:["Mata merah, gatal, berair, atau berdahak","Sejak kapan keluhan muncul","Riwayat alergi, paparan debu/asap, pemakaian lensa kontak","Adakah gangguan penglihatan (kabur, fotofobia)"],
-      objektif:["Inspeksi konjungtiva (hiperemis, kemosis, folikel)","Karakter sekret (bening/kental/bernanah)","Pemeriksaan kornea (keruh, ulkus)","Palpasi KGB preaurikuler","Tes visus dasar"],
-      vital:["Suhu tubuh (bila curiga infeksi sistemik)"]
+    subjektif:{
+      keluhanUtama:["Mata merah, gatal, berair, atau berdahak"],
+      riwayatSekarang:["Sejak kapan keluhan muncul","Riwayat alergi, paparan debu/asap, pemakaian lensa kontak","Adakah gangguan penglihatan (kabur, fotofobia)"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Suhu tubuh (bila curiga infeksi sistemik)"],
+      pemeriksaanFisik:["Inspeksi konjungtiva (hiperemis, kemosis, folikel)","Karakter sekret (bening/kental/bernanah)","Pemeriksaan kornea (keruh, ulkus)","Palpasi KGB preaurikuler","Tes visus dasar"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan tidak nyaman pada mata (gatal, perih, panas) akibat iritasi atau inflamasi konjungtiva/kornea."},
       {kode:"D.0142",nama:"Risiko Infeksi",def:"Berisiko mengalami infeksi lanjutan pada jaringan mata akibat paparan patogen atau kebersihan yang kurang."},
@@ -704,10 +969,24 @@ const data = {
 
   alergi:{
     pengkajian:{
-      subjektif:["Lokasi dan onset gatal/ruam","Paparan alergen (makanan, obat, debu, gigitan serangga, kosmetik)","Riwayat alergi sebelumnya","Adanya gejala lain (bersin, sesak napas, bengkak)"],
-      objektif:["Inspeksi kulit: urtikaria, eritema, ekskoriasi, atau edema","Dermatografisme","Edema wajah/bibir/lidah (waspada anafilaksis)","Tanda vital untuk skrining syok anafilaktik"],
-      vital:["Tekanan darah (waspada hipotensi pada anafilaksis)","Nadi","Frekuensi napas (bila ada edema laring)","Suhu tubuh"]
+    subjektif:{
+      keluhanUtama:["Lokasi dan onset gatal/ruam"],
+      riwayatSekarang:["Paparan alergen (makanan, obat, debu, gigitan serangga, kosmetik)","Riwayat alergi sebelumnya","Adanya gejala lain (bersin, sesak napas, bengkak)"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah (waspada hipotensi pada anafilaksis)","Nadi","Frekuensi napas (bila ada edema laring)","Suhu tubuh"],
+      pemeriksaanFisik:["Inspeksi kulit: urtikaria, eritema, ekskoriasi, atau edema","Dermatografisme","Edema wajah/bibir/lidah (waspada anafilaksis)","Tanda vital untuk skrining syok anafilaktik"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan tidak nyaman berupa gatal, perih, atau panas pada kulit akibat reaksi alergi."},
       {kode:"D.0129",nama:"Gangguan Integritas Kulit/Jaringan",def:"Kerusakan kulit akibat garukan atau reaksi inflamasi yang mengakibatkan eritema, urtikaria, atau ekskoriasi."},
@@ -724,10 +1003,24 @@ const data = {
 
   sakit_gigi:{
     pengkajian:{
-      subjektif:["Lokasi gigi yang sakit","Karakter nyeri (tajam/tumpul/berdenyut, terus-menerus/hilang timbul)","Pemicu (makanan/minuman dingin, panas, manis)","Riwayat karies, tambalan, atau trauma gigi"],
-      objektif:["Inspeksi gigi: karies, fraktur, atau abses","Palpasi gusi: bengkak, fluktuasi, nyeri tekan","Pembengkakan wajah atau KGB submandibula","Suhu tubuh"],
-      vital:["Tekanan darah (nyeri dapat meningkatkan TD)","Nadi","Suhu tubuh (waspada infeksi)"]
+    subjektif:{
+      keluhanUtama:["Lokasi gigi yang sakit"],
+      riwayatSekarang:["Karakter nyeri (tajam/tumpul/berdenyut, terus-menerus/hilang timbul)","Pemicu (makanan/minuman dingin, panas, manis)","Riwayat karies, tambalan, atau trauma gigi"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah (nyeri dapat meningkatkan TD)","Nadi","Suhu tubuh (waspada infeksi)"],
+      pemeriksaanFisik:["Inspeksi gigi: karies, fraktur, atau abses","Palpasi gusi: bengkak, fluktuasi, nyeri tekan","Pembengkakan wajah atau KGB submandibula","Suhu tubuh"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut",def:"Nyeri pada gigi dan jaringan sekitar akibat karies, pulpitis, atau abses gigi."},
       {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan tidak nyaman di rongga mulut akibat nyeri gigi yang mengganggu aktivitas makan dan tidur."},
@@ -744,10 +1037,24 @@ const data = {
 
   anemia:{
     pengkajian:{
-      subjektif:["Lemas, cepat lelah, pusing, sesak saat aktivitas","Riwayat perdarahan (haid berat, BAB hitam, mimisan)","Pola makan (kurang zat besi, vitamin B12, folat)","Riwayat penyakit kronis (gagal ginjal, kanker, autoimun)"],
-      objektif:["Konjungtiva pucat, telapak tangan pucat","Kuku pucat, rapuh, atau spoon nail","Takikardia, murmur jantung pada anemia berat","Frekuensi napas meningkat saat aktivitas"],
-      vital:["Tekanan darah","Nadi (takikardia sebagai kompensasi)","Frekuensi napas","Suhu tubuh"]
+    subjektif:{
+      keluhanUtama:["Lemas, cepat lelah, pusing, sesak saat aktivitas"],
+      riwayatSekarang:["Riwayat perdarahan (haid berat, BAB hitam, mimisan)","Pola makan (kurang zat besi, vitamin B12, folat)","Riwayat penyakit kronis (gagal ginjal, kanker, autoimun)"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah","Nadi (takikardia sebagai kompensasi)","Frekuensi napas","Suhu tubuh"],
+      pemeriksaanFisik:["Konjungtiva pucat, telapak tangan pucat","Kuku pucat, rapuh, atau spoon nail","Takikardia, murmur jantung pada anemia berat","Frekuensi napas meningkat saat aktivitas"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0056",nama:"Intoleransi Aktivitas",def:"Ketidakcukupan energi untuk melakukan aktivitas sehari-hari akibat penurunan kapasitas pengangkutan oksigen (anemia)."},
       {kode:"D.0054",nama:"Gangguan Mobilitas Fisik",def:"Keterbatasan gerak fisik akibat kelemahan dan kelelahan karena anemia."},
@@ -764,10 +1071,24 @@ const data = {
 
   cemas:{
     pengkajian:{
-      subjektif:["Perasaan khawatir/tegang/takut berlebihan","Pemicu kecemasan (pekerjaan, keluarga, kesehatan, finansial)","Gangguan tidur, palpitasi, gemetar, sulit konsentrasi","Riwayat gangguan cemas atau panik sebelumnya"],
-      objektif:["Ekspresi wajah tegang/cemas, gelisah","Kontak mata kurang, bicara cepat/terputus","Tremor halus pada jari, hiperhidrosis telapak tangan","Tanda vital meningkat saat cemas"],
-      vital:["Tekanan darah (meningkat saat cemas)","Nadi (takikardia)","Frekuensi napas (meningkat, hiperventilasi)","Suhu tubuh"]
+    subjektif:{
+      keluhanUtama:["Perasaan khawatir/tegang/takut berlebihan"],
+      riwayatSekarang:["Pemicu kecemasan (pekerjaan, keluarga, kesehatan, finansial)","Gangguan tidur, palpitasi, gemetar, sulit konsentrasi","Riwayat gangguan cemas atau panik sebelumnya"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah (meningkat saat cemas)","Nadi (takikardia)","Frekuensi napas (meningkat, hiperventilasi)","Suhu tubuh"],
+      pemeriksaanFisik:["Ekspresi wajah tegang/cemas, gelisah","Kontak mata kurang, bicara cepat/terputus","Tremor halus pada jari, hiperhidrosis telapak tangan","Tanda vital meningkat saat cemas"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0071",nama:"Ansietas",def:"Perasaan tidak nyaman/kekhawatiran yang menyebar dan respons otonom tidak spesifik akibat antisipasi bahaya yang tidak jelas."},
       {kode:"D.0050",nama:"Gangguan Pola Tidur",def:"Gangguan kuantitas/kualitas tidur akibat pikiran cemas yang mengganggu proses relaksasi dan tidur."},
@@ -784,10 +1105,24 @@ const data = {
 
   nyeri_dada:{
     pengkajian:{
-      subjektif:["Lokasi nyeri dada (kiri/tengah/kanan), karakter (tajam/tumpul/tertekan)","Apakah nyeri menjalar ke lengan, rahang, atau punggung","Pemicu (aktivitas, istirahat, napas dalam)","Sesak napas, keringat dingin, mual penyerta","Riwayat jantung, hipertensi, diabetes, atau merokok"],
-      objektif:["Ekspresi wajah menyeringai/tegang akibat nyeri","Palpasi dada (nyeri tekan pada area tertentu)","Auskultasi jantung dan paru","Tanda vital untuk skrining akut"],
-      vital:["Tekanan darah (kedua lengan) — fokus utama","Nadi (irama, kekuatan, frekuensi)","Frekuensi napas","Saturasi oksigen (SpO2)"]
+    subjektif:{
+      keluhanUtama:["Lokasi nyeri dada (kiri/tengah/kanan), karakter (tajam/tumpul/tertekan)"],
+      riwayatSekarang:["Apakah nyeri menjalar ke lengan, rahang, atau punggung","Pemicu (aktivitas, istirahat, napas dalam)","Sesak napas, keringat dingin, mual penyerta","Riwayat jantung, hipertensi, diabetes, atau merokok"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah (kedua lengan) — fokus utama","Nadi (irama, kekuatan, frekuensi)","Frekuensi napas","Saturasi oksigen (SpO2)"],
+      pemeriksaanFisik:["Ekspresi wajah menyeringai/tegang akibat nyeri","Palpasi dada (nyeri tekan pada area tertentu)","Auskultasi jantung dan paru","Tanda vital untuk skrining akut"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut",def:"Nyeri pada area dada akibat berbagai penyebab (muskuloskeletal, pleuritik, kardiak, atau psikogenik)."},
       {kode:"D.0071",nama:"Ansietas",def:"Perasaan khawatir berlebihan terkait nyeri dada yang dialami — dapat memperberat gejala."},
@@ -804,10 +1139,24 @@ const data = {
 
   sakit_telinga:{
     pengkajian:{
-      subjektif:["Nyeri pada telinga (satu/kedua sisi), sejak kapan","Demam, gangguan pendengaran, atau keluar cairan dari telinga","Riwayat infeksi telinga sebelumnya, kebiasaan mengorek telinga","Pada anak: rewel, menarik-narik telinga"],
-      objektif:["Otoskopi: hiperemis membran timpani, perforasi, atau sekret","Palpasi KGB retroaurikuler dan leher","Suhu tubuh (demam pada infeksi akut)"],
-      vital:["Suhu tubuh — fokus utama","Nadi","Frekuensi napas (pada anak)"]
+    subjektif:{
+      keluhanUtama:["Nyeri pada telinga (satu/kedua sisi), sejak kapan"],
+      riwayatSekarang:["Demam, gangguan pendengaran, atau keluar cairan dari telinga","Riwayat infeksi telinga sebelumnya, kebiasaan mengorek telinga","Pada anak: rewel, menarik-narik telinga"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Suhu tubuh — fokus utama","Nadi","Frekuensi napas (pada anak)"],
+      pemeriksaanFisik:["Otoskopi: hiperemis membran timpani, perforasi, atau sekret","Palpasi KGB retroaurikuler dan leher","Suhu tubuh (demam pada infeksi akut)"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut",def:"Nyeri pada telinga akibat inflamasi membran timpani atau liang telinga (otitis media eksterna/akut)."},
       {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan tidak nyaman pada telinga (terasa penuh, berdenging, gatal) akibat proses infeksi."},
@@ -824,10 +1173,24 @@ const data = {
 
   konstipasi:{
     pengkajian:{
-      subjektif:["Frekuensi BAB (<3 kali per minggu), konsistensi keras/kering","Mengejan berlebihan, rasa BAB tidak tuntas","Sejak kapan keluhan muncul","Pola makan: kurang serat, kurang cairan, perubahan pola makan","Riwayat obat (opioid, antasida, antidepresan)"],
-      objektif:["Palpasi abdomen: massa feses di kuadran kiri bawah","Bising usus (menurun)","Inspeksi anus (fisura, wasir akibat mengejan)"],
-      vital:["Tekanan darah","Nadi","Suhu tubuh"]
+    subjektif:{
+      keluhanUtama:["Frekuensi BAB (<3 kali per minggu), konsistensi keras/kering"],
+      riwayatSekarang:["Mengejan berlebihan, rasa BAB tidak tuntas","Sejak kapan keluhan muncul","Pola makan: kurang serat, kurang cairan, perubahan pola makan","Riwayat obat (opioid, antasida, antidepresan)"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah","Nadi","Suhu tubuh"],
+      pemeriksaanFisik:["Palpasi abdomen: massa feses di kuadran kiri bawah","Bising usus (menurun)","Inspeksi anus (fisura, wasir akibat mengejan)"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0049",nama:"Konstipasi",def:"Penurunan frekuensi BAB disertai pengeluaran feses keras/kering, mengejan, atau rasa BAB tidak tuntas."},
       {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan tidak nyaman pada abdomen (kembung, penuh, nyeri) akibat retensi feses."}
@@ -842,10 +1205,24 @@ const data = {
 
   insomnia:{
     pengkajian:{
-      subjektif:["Kesulitan memulai tidur, sering terbangun, atau bangun terlalu pagi","Jam tidur rata-rata per malam","Faktor penyebab (stres, nyeri, lingkungan, kafein)","Dampak siang hari: mengantuk, lelah, sulit konsentrasi, mudah marah","Riwayat gangguan tidur sebelumnya"],
-      objektif:["Tampilan fisik: lingkar hitam bawah mata, sering menguap","Konsentrasi dan respons saat wawancara","Tanda vital"],
-      vital:["Tekanan darah","Nadi","Frekuensi napas"]
+    subjektif:{
+      keluhanUtama:["Kesulitan memulai tidur, sering terbangun, atau bangun terlalu pagi"],
+      riwayatSekarang:["Jam tidur rata-rata per malam","Faktor penyebab (stres, nyeri, lingkungan, kafein)","Dampak siang hari: mengantuk, lelah, sulit konsentrasi, mudah marah","Riwayat gangguan tidur sebelumnya"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Tekanan darah","Nadi","Frekuensi napas"],
+      pemeriksaanFisik:["Tampilan fisik: lingkar hitam bawah mata, sering menguap","Konsentrasi dan respons saat wawancara","Tanda vital"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0050",nama:"Gangguan Pola Tidur",def:"Gangguan kuantitas dan kualitas tidur akibat faktor eksternal/internal yang mengganggu siklus tidur normal."},
       {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan tidak nyaman akibat kurang tidur yang berdampak pada fungsi fisik dan mental."},
@@ -861,10 +1238,24 @@ const data = {
 
   isk:{
     pengkajian:{
-      subjektif:["Nyeri/panas saat BAK (disuria)","Frekuensi BAK meningkat (poliuria), anyang-anyangan","Warna urin keruh/berdarah, bau menyengat","Nyeri pinggang atau suprapubik","Riwayat ISK sebelumnya, kateterisasi, atau kehamilan"],
-      objektif:["Suhu tubuh (demam pada infeksi aktif)","Palpasi abdomen: nyeri tekan suprapubik","Nyeri ketok pinggang (CVA tenderness) pada pielonefritis","Urinalisis: leukosit, nitrit, bakteri"],
-      vital:["Suhu tubuh — fokus utama","Tekanan darah","Nadi"]
+    subjektif:{
+      keluhanUtama:["Nyeri/panas saat BAK (disuria)"],
+      riwayatSekarang:["Frekuensi BAK meningkat (poliuria), anyang-anyangan","Warna urin keruh/berdarah, bau menyengat","Nyeri pinggang atau suprapubik","Riwayat ISK sebelumnya, kateterisasi, atau kehamilan"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Suhu tubuh — fokus utama","Tekanan darah","Nadi"],
+      pemeriksaanFisik:["Suhu tubuh (demam pada infeksi aktif)","Palpasi abdomen: nyeri tekan suprapubik","Nyeri ketok pinggang (CVA tenderness) pada pielonefritis","Urinalisis: leukosit, nitrit, bakteri"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut",def:"Nyeri saat berkemih dan nyeri suprapubik akibat iritasi mukosa vesika urinaria oleh proses infeksi."},
       {kode:"D.0074",nama:"Gangguan Rasa Nyaman",def:"Perasaan tidak nyaman pada saluran kemih (panas, anyang-anyangan, rasa ingin BAK terus) akibat infeksi."},
@@ -881,10 +1272,24 @@ const data = {
 
   nyeri_sendi:{
     pengkajian:{
-      subjektif:["Sendi yang terkena (lutut, jari, pergelangan, siku)","Karakter nyeri (tajam/tumpul, kaku), onset (pagi hari/sepanjang hari)","Faktor pemicu (gerakan, cuaca dingin, makanan)","Riwayat asam urat, rematik, atau cedera sendi sebelumnya"],
-      objektif:["Inspeksi sendi: bengkak, kemerahan, hangat, deformitas","ROM (range of motion): terbatas atau tidak","Kekuatan otot sekitar sendi","Palpasi untuk nyeri tekan dan efusi sendi"],
-      vital:["Suhu tubuh (bila curiga arthritis septik/gout akut)","Tekanan darah","Nadi"]
+    subjektif:{
+      keluhanUtama:["Sendi yang terkena (lutut, jari, pergelangan, siku)"],
+      riwayatSekarang:["Karakter nyeri (tajam/tumpul, kaku), onset (pagi hari/sepanjang hari)","Faktor pemicu (gerakan, cuaca dingin, makanan)","Riwayat asam urat, rematik, atau cedera sendi sebelumnya"],
+      riwayatDahulu:["Riwayat penyakit kronis (DM, hipertensi, asma, dll)","Riwayat pengobatan jangka panjang"],
+      riwayatKeluarga:["Riwayat penyakit serupa dalam keluarga","Riwayat penyakit keturunan (hipertensi, DM, jantung)"],
+      kebutuhanDasar:{
+        nutrisiCairan:["Asupan makan/minum selama sakit — risiko dehidrasi/intake tidak adekuat","Mual/muntah yang mempengaruhi intake"],
+        eliminasi:["Pola BAB dan BAK — frekuensi, warna, konsistensi","Perubahan eliminasi akibat kondisi sakit"],
+        aktivitas:["Keterbatasan aktivitas akibat kondisi sakit","Kebutuhan istirahat dan tirah baring"],
+        psikososial:["Kecemasan terkait kondisi kesehatan","Dukungan keluarga selama perawatan"]
+      }
     },
+    objektif:{
+      tandaVital:["Suhu tubuh (bila curiga arthritis septik/gout akut)","Tekanan darah","Nadi"],
+      pemeriksaanFisik:["Inspeksi sendi: bengkak, kemerahan, hangat, deformitas","ROM (range of motion): terbatas atau tidak","Kekuatan otot sekitar sendi","Palpasi untuk nyeri tekan dan efusi sendi"],
+      penunjang:null
+    }
+  },
     diagnosa:[
       {kode:"D.0077",nama:"Nyeri Akut",def:"Nyeri pada satu atau lebih sendi akibat inflamasi (gout, artritis reumatoid, atau trauma)."},
       {kode:"D.0054",nama:"Gangguan Mobilitas Fisik",def:"Keterbatasan gerak sendi akibat nyeri dan kekakuan yang mengganggu aktivitas sehari-hari."},
@@ -902,22 +1307,174 @@ const data = {
 
 renderAlurChips();
 
-const pages = ['pengkajian','diagnosa','intervensi','implementasi','evaluasi','penunjang'];
-const selectedKasus = {};
-
-function renderChips(page){
-  document.getElementById('chips-'+page).innerHTML = kasusList.map(k =>
-    `<div class="chip" id="chip-${page}-${k.key}" onclick="selectKasus('${page}','${k.key}')">${k.icon} ${k.label}</div>`
-  ).join('');
+function escapeHtml(t){const d=document.createElement('div');d.appendChild(document.createTextNode(t));return d.innerHTML;}
+function searchKnowledge(query){
+  const tokens = query.toLowerCase().split(/\s+/).filter(t=>t.length>2);
+  const results = [];
+  for(const [key, kasus] of Object.entries(data)){
+    if(!kasus) continue;
+    const kasusLabel = (kasusList.find(k=>k.key===key)||{}).label||key;
+    let score = 0;
+    const matchedItems = [];
+    const labelL = kasusLabel.toLowerCase();
+    tokens.forEach(t=>{if(labelL.includes(t))score+=3;});
+    if(kasus.diagnosa) kasus.diagnosa.forEach(dx=>{
+      const txt = (dx.kode+' '+dx.nama+' '+dx.def).toLowerCase();
+      tokens.forEach(t=>{if(txt.includes(t)){score+=2;if(!matchedItems.find(m=>m.text===dx.kode+' '+dx.nama))matchedItems.push({type:'Diagnosa',text:dx.kode+' '+dx.nama});}});
+    });
+    if(kasus.pengkajian){
+      const pkSearch = (obj) => { for(const v of Object.values(obj)){ if(Array.isArray(v)) v.forEach(item => { const il = item.toLowerCase(); tokens.forEach(t => { if(il.includes(t) && !matchedItems.find(m=>m.text===item)) matchedItems.push({type:'Pengkajian',text:item}); }); }); else if(v && typeof v === 'object' && !Array.isArray(v)) pkSearch(v); } };
+      pkSearch(kasus.pengkajian);
+    }
+    if(kasus.intervensi) kasus.intervensi.forEach(iv=>{
+      const ivt = iv.dx.toLowerCase();
+      tokens.forEach(t=>{if(ivt.includes(t))score+=1;});
+      ['observasi','terapeutik','edukasi','kolaborasi'].forEach(cat=>{
+        (iv[cat]||[]).forEach(item=>{
+          const il = item.toLowerCase();
+          tokens.forEach(t=>{if(il.includes(t)){score+=1;if(!matchedItems.find(m=>m.text===item))matchedItems.push({type:'Intervensi',text:item});}});
+        });
+      });
+    });
+    if(kasus.implementasi) kasus.implementasi.forEach(item=>{
+      const il = item.toLowerCase();
+      tokens.forEach(t=>{if(il.includes(t)){score+=1;if(!matchedItems.find(m=>m.text===item))matchedItems.push({type:'Implementasi',text:item});}});
+    });
+    if(kasus.penunjang) kasus.penunjang.forEach(item=>{
+      const il = item.toLowerCase();
+      tokens.forEach(t=>{if(il.includes(t)){score+=1;if(!matchedItems.find(m=>m.text===item))matchedItems.push({type:'Penunjang',text:item});}});
+    });
+    if(score>0) results.push({key,label:kasusLabel,icon:(kasusList.find(k=>k.key===key)||{}).icon||'📋',score,matchedItems});
+  }
+  results.sort((a,b)=>b.score-a.score);
+  return results.slice(0,3);
 }
-pages.forEach(renderChips);
+function suggestDiagnoses(){
+  const texts = window.assessmentData[alurKasus] || {};
+  const allText = Object.values(texts).filter(Boolean).join(' ');
+  if (!allText.trim()) return [];
+  let tokens = allText.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+  if (tokens.length === 0) return [];
+  const stopWords = new Set(['riwayat','penyakit','kronis','pengobatan','jangka','panjang','serupa','dalam','keluarga','keturunan','asupan','selama','sakit','risiko','tidak','yang','mempengaruhi','intake','dengan','untuk','pada','dari','dan','ini','atau','akan','dapat','pola','kebutuhan','dasar','keluhan','utama','fisik','dahulu','sekarang','saat','setelah','sebelum','perlu','bila','umum','dimana','berkepanjangan','kondisi','lama','lengkap','berikut','secara','akibat','sebagai','serta','adanya','pasien','lihat','panduan','tampilkan','tulis']);
+  tokens = tokens.filter(t => !stopWords.has(t));
+  if (tokens.length === 0) return [];
+  const TC = Object.keys(data).length || 25;
+  const tokenCount = {};
+  tokens.forEach(t => tokenCount[t] = 0);
+  for (const [, kasus] of Object.entries(data)) {
+    if (!kasus.pengkajian) continue;
+    const items = [];
+    const collect = (obj) => { for (const v of Object.values(obj)) { if (Array.isArray(v)) items.push(...v); else if (v && typeof v === 'object' && !Array.isArray(v)) collect(v); } };
+    collect(kasus.pengkajian);
+    const text = items.join(' ').toLowerCase();
+    for (const t of tokens) if (text.includes(t)) tokenCount[t]++;
+  }
+  const dxScores = {};
+  for (const [key, kasus] of Object.entries(data)) {
+    if (!kasus.pengkajian || !kasus.diagnosa) continue;
+    const items = [];
+    const collect = (obj) => { for (const v of Object.values(obj)) { if (Array.isArray(v)) items.push(...v); else if (v && typeof v === 'object' && !Array.isArray(v)) collect(v); } };
+    collect(kasus.pengkajian);
+    const text = items.join(' ').toLowerCase();
+    let score = 0;
+    for (const t of tokens) {
+      if (text.includes(t)) {
+        const idf = Math.log((TC + 1) / (tokenCount[t] + 1)) + 0.5;
+        score += idf;
+      }
+    }
+    if (score === 0) continue;
+    kasus.diagnosa.forEach(dx => {
+      if (!dxScores[dx.kode]) dxScores[dx.kode] = { kode: dx.kode, nama: dx.nama, score: 0, def: dx.def };
+      dxScores[dx.kode].score += score;
+    });
+  }
+  return Object.values(dxScores).sort((a, b) => b.score - a.score).slice(0, 5);
+}
+function useSuggestedDiagnosis(idx){
+  const s = (window._suggestions || [])[idx];
+  if (!s) return;
+  window.diagnosaData = window.diagnosaData || {};
+  const rows = window.diagnosaData[alurKasus] || [{kode:'',nama:'',definisi:''}];
+  if (rows.length === 1 && !rows[0].kode && !rows[0].nama) {
+    rows[0] = { kode: s.kode, nama: s.nama, definisi: s.def };
+  } else {
+    rows.push({ kode: s.kode, nama: s.nama, definisi: s.def });
+  }
+  window.diagnosaData[alurKasus] = rows;
+  const d = data[alurKasus];
+  const kasus = kasusList.find(k => k.key === alurKasus);
+  alurRenderBody('diagnosa', d, kasus);
+}
+let chatOpen = false;
+function toggleChat(){
+  chatOpen = !chatOpen;
+  document.getElementById('chat-panel').classList.toggle('open', chatOpen);
+  if(chatOpen && !document.querySelector('#chat-msgs .chatbot-bubble')){
+    addChatMsg('ai','Halo! Saya bisa bantu menjawab pertanyaan seputar diagnosa, pengkajian, intervensi, dan informasi keperawatan lainnya. Coba tanya, misal: "apa diagnosa untuk demam?" atau "intervensi nyeri akut"');
+  }
+}
+function addChatMsg(role, html){
+  const el = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'chatbot-bubble '+role;
+  div.innerHTML = html;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+function sendChat(){
+  const inp = document.getElementById('chat-input');
+  const q = inp.value.trim();
+  if(!q) return;
+  addChatMsg('user', escapeHtml(q));
+  inp.value = '';
+  setTimeout(()=>{
+    const results = searchKnowledge(q);
+    if(results.length===0){
+      addChatMsg('ai','Tidak menemukan informasi yang cocok. Coba kata kunci lain (misal: demam, nyeri, sesak, batuk).');
+      return;
+    }
+    let html = 'Ditemukan:<br><br>';
+    results.forEach(r=>{
+      html += `<strong>${r.icon} ${escapeHtml(r.label)}</strong><br>`;
+      r.matchedItems.slice(0,4).forEach(m=>{
+        html += `• [${m.type}] ${escapeHtml(m.text)}<br>`;
+      });
+      html += `<span class="goto" onclick="showPage('alur');setTimeout(()=>alurSetKeluhan('${r.key}'),100)">→ Buka detail ${escapeHtml(r.label)}</span><br><br>`;
+    });
+    addChatMsg('ai', html);
+  }, 300);
+}
+function chatKey(e){if(e.key==='Enter')sendChat();}
 
-function selectKasus(page, key){
-  selectedKasus[page] = key;
-  kasusList.forEach(k=>{
-    document.getElementById(`chip-${page}-${k.key}`).classList.toggle('active', k.key===key);
-  });
+const pages = ['pengkajian','diagnosa','intervensi','implementasi','evaluasi','penunjang'];
+
+function renderFormPage(page){
+  const container = document.getElementById('chips-'+page);
+  container.innerHTML = `
+    <div class="form-field">
+      <label>Keluhan Utama</label>
+      <input class="form-input" id="static-keluhan-${page}" placeholder="Ketik keluhan pasien..." oninput="filterStaticResult('${page}')">
+    </div>
+    <div style="font-size:12px;color:var(--gray);margin-top:6px;"><span class="panduan-btn" onclick="togglePanduan('static-${page}')">📖 Lihat Daftar Keluhan</span></div>
+    <div class="panduan-content" id="panduan-static-${page}">
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">${kasusList.map(k=>`<span style="cursor:pointer;color:var(--teal);font-weight:600;" onclick="fillStaticKeluhan('${page}','${k.key}')">${k.icon} ${k.label}</span>`).join(', ')}</div>
+    </div>`;
+}
+pages.forEach(renderFormPage);
+
+function fillStaticKeluhan(page, key){
+  const kasus = kasusList.find(k=>k.key===key);
+  if(!kasus) return;
+  document.getElementById('static-keluhan-'+page).value = kasus.label;
   renderResult(page, key);
+}
+function filterStaticResult(page){
+  const txt = document.getElementById('static-keluhan-'+page).value.trim().toLowerCase();
+  if(!txt){ document.getElementById('result-'+page).innerHTML = '<div class="empty-hint">Ketik keluhan untuk melihat data terkait.</div>'; return; }
+  const matched = kasusList.find(k=>k.label.toLowerCase()===txt) || kasusList.find(k=>k.label.toLowerCase().includes(txt)) || kasusList.find(k=>txt.includes(k.label.toLowerCase()));
+  if(matched) renderResult(page, matched.key);
+  else document.getElementById('result-'+page).innerHTML = '<div class="empty-hint">Keluhan tidak ditemukan. Coba kata kunci lain.</div>';
 }
 
 function renderResult(page, key){
@@ -927,15 +1484,33 @@ function renderResult(page, key){
   if(!d){ el.innerHTML = '<div class="empty-hint">Data belum tersedia untuk keluhan ini.</div>'; return; }
 
   if(page==='pengkajian'){
+    const s = d.pengkajian.subjektif, o = d.pengkajian.objektif;
     el.innerHTML = `
       <div class="res-card">
         <h3>${kasus.icon} Fokus Pengkajian — ${kasus.label}</h3>
-        <div class="subhead">Data Subjektif (Anamnesis)</div>
-        <ul>${d.pengkajian.subjektif.map(i=>`<li>${i}</li>`).join('')}</ul>
-        <div class="subhead">Data Objektif (Pemeriksaan Fisik)</div>
-        <ul>${d.pengkajian.objektif.map(i=>`<li>${i}</li>`).join('')}</ul>
-        <div class="subhead">Fokus Tanda Vital</div>
-        <ul>${d.pengkajian.vital.map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead">A. Data Subjektif</div>
+        <div class="subhead" style="font-size:11px;margin-left:8px;">1. Keluhan Utama</div>
+        <ul>${(s.keluhanUtama||[]).map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead" style="font-size:11px;margin-left:8px;">2. Riwayat Penyakit Sekarang</div>
+        <ul>${(s.riwayatSekarang||[]).map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead" style="font-size:11px;margin-left:8px;">3. Riwayat Penyakit Dahulu</div>
+        <ul>${(s.riwayatDahulu||[]).map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead" style="font-size:11px;margin-left:8px;">4. Riwayat Keluarga</div>
+        <ul>${(s.riwayatKeluarga||[]).map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead" style="font-size:11px;margin-left:8px;">5. Kebutuhan Dasar</div>
+        <ul>${[
+          s.kebutuhanDasar?.nutrisiCairan ? `<li><b>Nutrisi/Cairan:</b> ${s.kebutuhanDasar.nutrisiCairan.join(', ')}</li>` : '',
+          s.kebutuhanDasar?.eliminasi ? `<li><b>Eliminasi:</b> ${s.kebutuhanDasar.eliminasi.join(', ')}</li>` : '',
+          s.kebutuhanDasar?.aktivitas ? `<li><b>Aktivitas:</b> ${s.kebutuhanDasar.aktivitas.join(', ')}</li>` : '',
+          s.kebutuhanDasar?.psikososial ? `<li><b>Psikososial:</b> ${s.kebutuhanDasar.psikososial.join(', ')}</li>` : ''
+        ].filter(Boolean).join('')}</ul>
+        <div class="subhead">B. Data Objektif</div>
+        <div class="subhead" style="font-size:11px;margin-left:8px;">1. Tanda-Tanda Vital</div>
+        <ul>${(o.tandaVital||[]).map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead" style="font-size:11px;margin-left:8px;">2. Pemeriksaan Fisik</div>
+        <ul>${(o.pemeriksaanFisik||[]).map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="subhead" style="font-size:11px;margin-left:8px;">3. Pemeriksaan Penunjang</div>
+        <ul>${(o.penunjang||d.penunjang||[]).map(i=>`<li>${i}</li>`).join('')}</ul>
       </div>`;
   }
   else if(page==='diagnosa'){
@@ -979,79 +1554,46 @@ function renderResult(page, key){
         <div class="tag-row">${d.penunjang.map(i=>`<span class="tag-pill">${i}</span>`).join('')}</div>
       </div>`;
   }
+  el.insertAdjacentHTML('beforeend','<div style="text-align:center;margin-top:16px;"><button class="btn-primary" onclick="alurSetKeluhan(\''+key+'\')">🚀 Buat Asuhan Keperawatan</button></div>');
 }
-function filterAlurChips(){
-  const q = document.getElementById('alur-search').value.toLowerCase();
-  document.querySelectorAll('#chips-alur .chip').forEach(chip => {
-    chip.style.display = chip.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
-}
-function togglePasien(){
-  const f = document.getElementById('pasien-form');
-  const icon = document.getElementById('pasien-icon');
-  if(f.style.display==='none'){f.style.display='flex';icon.textContent='▾';}
-  else{f.style.display='none';icon.textContent='▸';}
-}
-function getPasien(){
-  return {
-    nama: document.getElementById('pasien-nama').value.trim(),
-    usia: document.getElementById('pasien-usia').value.trim(),
-    kelamin: document.getElementById('pasien-kelamin').value,
-    norm: document.getElementById('pasien-norm').value.trim(),
-    riwayat: document.getElementById('pasien-riwayat').value.trim()
-  };
-}
-function updatePasienBar(){
-  const p = getPasien();
-  const bar = document.getElementById('pasien-bar');
-  const summary = document.getElementById('pasien-summary');
-  const parts = [];
-  if(p.nama) parts.push(p.nama);
-  if(p.usia) parts.push(p.usia+' th');
-  if(p.kelamin) parts.push(p.kelamin);
-  if(p.norm && parts.length) parts.push('RM: '+p.norm);
-  else if(p.norm) parts.push('RM: '+p.norm);
-  summary.textContent = parts.length ? '\u2014 '+parts.join(', ') : '';
-  if(p.nama || p.usia || p.kelamin || p.norm){
-    bar.style.display='flex';
-    const barParts = [];
-    if(p.nama) barParts.push('<b>'+p.nama+'</b>');
-    if(p.usia) barParts.push(p.usia+' th');
-    if(p.kelamin) barParts.push(p.kelamin);
-    if(p.norm) barParts.push('RM: '+p.norm);
-    bar.innerHTML = '\uD83D\uDC64 '+barParts.join(' \u2022 ')+' <span style="font-size:11px;color:var(--gray);margin-left:auto;cursor:pointer" onclick="togglePasien()">\u270F\uFE0F edit</span>';
-  } else {
-    bar.style.display='none';
-  }
-}
-window.assessmentData = {}; window.checkedData = {}; window.confirmedDx = 0; window.evaluasiData = {};
-const alurSteps = ['pilih','pengkajian','diagnosa','intervensi','implementasi','evaluasi','penunjang'];
-const alurLabels = ['Pilih','Pengkajian','Diagnosa','Intervensi','Implementasi','Evaluasi','Penunjang'];
+window.assessmentData = {}; window.evaluasiData = {};
+const alurSteps = ['pilih','pengkajian','diagnosa','intervensi','implementasi','evaluasi','penunjang','selesai'];
+const alurLabels = ['Pilih','Pengkajian','Diagnosa','Intervensi','Implementasi','Evaluasi','Penunjang','Selesai'];
 let alurCurrent = 0;
 let alurKasus = null;
 
 function renderAlurChips(){
-  document.getElementById('chips-alur').innerHTML = kasusList.map(k =>
-    `<div class="chip" onclick="alurSelect('${k.key}')">${k.icon} ${k.label}</div>`
-  ).join('');
+  const el = document.getElementById('panduan-alur');
+  if(el) el.innerHTML = `<div class="subhead">Daftar Keluhan Referensi</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">${kasusList.map(k=>`<span style="cursor:pointer;color:var(--teal);font-weight:600;" onclick="document.getElementById('alur-keluhan').value='${k.label}';onKeluhanInput()">${k.icon} ${k.label}</span>`).join(', ')}</div>`;
 }
-
-function alurSelect(key){
-  alurKasus = key;
+function onKeluhanInput(){
+  const v = document.getElementById('alur-keluhan').value.trim();
+  document.getElementById('alur-next').disabled = !v;
+  const btn = document.getElementById('alur-start-btn');
+  if(btn) btn.disabled = !v;
+}
+function alurSetKeluhan(key){
+  const kasus = kasusList.find(k=>k.key===key);
+  if(!kasus) return;
+  document.getElementById('alur-keluhan').value = kasus.label;
   document.getElementById('alur-selector').style.display = 'none';
   document.getElementById('alur-content').style.display = 'block';
   alurCurrent = 1;
   renderAlur();
+}
+function togglePanduan(id){
+  const el = document.getElementById('panduan-'+id);
+  if(el) el.classList.toggle('open');
 }
 
 function renderAlur(){
   const d = data[alurKasus];
   const kasus = kasusList.find(k => k.key === alurKasus);
   let html = '';
-  for(let i=1; i<=6; i++){
+  for(let i=1; i<=7; i++){
     const cls = i < alurCurrent ? 'done' : i === alurCurrent ? 'active' : '';
     html += `<div class="alur-sdot ${cls}">${i}</div>`;
-    if(i<6) html += `<div class="alur-sline ${i < alurCurrent ? 'done' : ''}"></div>`;
+    if(i<7) html += `<div class="alur-sline ${i < alurCurrent ? 'done' : ''}"></div>`;
   }
   document.getElementById('alur-steps').innerHTML = html;
   document.getElementById('alur-labels').innerHTML = alurLabels.slice(1).map((l,i) => {
@@ -1061,226 +1603,208 @@ function renderAlur(){
   alurRenderBody(alurSteps[alurCurrent], d, kasus);
   document.getElementById('alur-prev').style.visibility = alurCurrent > 1 ? 'visible' : 'hidden';
   const nb = document.getElementById('alur-next');
-  nb.textContent = alurCurrent < 6 ? 'Selanjutnya \u2192' : '\u2705 Selesai';
+  if(alurCurrent === 7){
+    nb.style.display = 'none';
+    document.getElementById('alur-prev').style.display = 'none';
+  } else {
+    nb.style.display = '';
+    document.getElementById('alur-prev').style.display = '';
+    nb.textContent = alurCurrent < 6 ? 'Selanjutnya \u2192' : '\u2705 Selesai';
+  }
 }
 
-function getDropdownOpts(label, cat){
-  const l = label.toLowerCase();
-  // Most specific first
-  if(l.includes('menggigil')) return ['Tidak menggigil','Menggigil ringan','Menggigil berat','Keringat dingin'];
-  if(l.includes('dehidrasi')||l.includes('turgor')||l.includes('mukosa')) return ['Normal','Kering ringan','Kering berat','Turgor menurun'];
-  if(l.includes('nafsu')||l.includes('makan')||l.includes('minum')) return ['Baik','Menurun','Tidak mau'];
-  if(l.includes('nyeri')&&l.includes('dada')) return ['Tidak nyeri','Ringan','Sedang','Berat','Seperti tertindih'];
-  if(l.includes('nyeri')&&(l.includes('kepala')||l.includes('tenggorok'))) return ['Tidak nyeri','Ringan','Sedang','Berat'];
-  if(l.includes('nadi')||l.includes('denyut')) return ['Normal (60-100)','Takikardi (>100)','Bradikardi (<60)','Tidak teratur'];
-  if(l.includes('suhu')||l.includes('demam')||l.includes('panas')) return ['< 37\u00B0C','37-38\u00B0C','38-39\u00B0C','> 39\u00B0C'];
-  if(l.includes('tidur')||l.includes('insomnia')) return ['Normal','Sulit tidur','Sering terbangun','Tidak bisa tidur'];
-  if(l.includes('kesadaran')||l.includes('gcs')||l.includes('mental')) return ['Compos mentis','Apatis','Somnolen','Sopor','Koma'];
-  if(l.includes('tekanan darah')||l.includes('tensi')||l.includes('td')) return ['Normal','Hipertensi','Hipotensi'];
-  if(l.includes('nafas')||l.includes('rr')||l.includes('respirasi')||l.includes('napas')) return ['Normal (16-20)','Takipnea (>20)','Bradipnea (<16)'];
-  if(l.includes('nyeri')) return ['Tidak nyeri','Ringan (1-3)','Sedang (4-6)','Berat (7-10)'];
-  if(l.includes('warna')||l.includes('kulit')) return ['Normal','Kemerahan','Pucat','Sianosis','Ikterik'];
-  if(l.includes('bengkak')||l.includes('edema')||l.includes('sendi')) return ['Tidak ada','Ringan','Sedang','Berat'];
-  if(l.includes('mual')||l.includes('muntah')) return ['Tidak ada','Ringan','Sedang','Berat'];
-  if(l.includes('batuk')) return ['Tidak batuk','Batuk kering','Batuk berdahak','Batuk darah'];
-  if(l.includes('mata')||l.includes('penglihatan')) return ['Normal','Merah','Berair','Bengkak','Gatal'];
-  if(l.includes('telinga')||l.includes('pendengaran')) return ['Normal','Nyeri','Bengkak','Keluar cairan'];
-  if(l.includes('tenggorokan')||l.includes('telan')) return ['Normal','Merah','Nyeri telan','Bengkak','Ada bercak'];
-  if(l.includes('lokasi')||l.includes('letak')||l.includes('area')) return ['Kepala','Dada','Perut','Punggung','Ekstremitas'];
-  if(l.includes('frekuensi')||l.includes('durasi')||l.includes('lamanya')) return ['Sesekali','Sering','Terus-menerus','Tidak menentu'];
-  if(l.includes('gatal')||l.includes('alergi')) return ['Tidak gatal','Ringan','Sedang','Berat'];
-  if(l.includes('luka')) return ['Bersih','Kotor','Berbau','Ada jaringan nekrotik'];
-  if(l.includes('diare')||l.includes('bab')||l.includes('buang')) return ['Normal','Cair','Berlendir','Berampas','Berbau'];
-  if(l.includes('kencing')||l.includes('bak')||l.includes('urin')||l.includes('kemih')) return ['Normal','Nyeri','Tersendat','Keruh','Berbau','Berwarna merah'];
-  if(l.includes('riwayat')||l.includes('perjalanan')||l.includes('kontak')||l.includes('imunisasi')) return ['Ada riwayat','Tidak ada riwayat'];
-  if(cat==='vital') return ['Normal','Meningkat','Menurun','Tidak diukur'];
-  return ['Normal / Tidak ada','Ringan','Sedang','Berat','Tidak dikaji'];
-}
 function saveAssessment(){
-  window.assessmentData[alurKasus] = window.assessmentData[alurKasus] || [];
+  window.assessmentData[alurKasus] = window.assessmentData[alurKasus] || {};
   document.querySelectorAll('#alur-body .pengkajian-inp').forEach((inp,i)=>{
-    window.assessmentData[alurKasus][i] = inp.value;
+    window.assessmentData[alurKasus][inp.dataset.idx] = inp.value;
   });
-}
-function saveChecklist(prefix){
-  window.checkedData[prefix] = window.checkedData[prefix] || [];
-  document.querySelectorAll('#alur-body .chk-'+prefix).forEach((cb,i)=>{
-    window.checkedData[prefix][i] = cb.checked;
-  });
-}
-function assessText(key){
-  const ad = window.assessmentData[key] || [];
-  return ad.filter(v=>v).join(' ').toLowerCase();
-}
-function assessLabels(key){
-  const d = data[key]; if(!d) return '';
-  const ad = window.assessmentData[key] || [];
-  const allLabels = [...d.pengkajian.subjektif, ...d.pengkajian.objektif, ...d.pengkajian.vital];
-  const abnormal = [];
-  ad.forEach((v,i)=>{
-    if(v && allLabels[i]) abnormal.push(allLabels[i]);
-  });
-  return abnormal.join(' ').toLowerCase();
-}
-function scoreDiagnosa(key){
-  const d = data[key]; if(!d) return [];
-  const txt = assessText(key)+' '+assessLabels(key);
-  return d.diagnosa.map(dx => {
-    const target = (dx.kode+' '+dx.nama+' '+dx.def).toLowerCase();
-    const words = [...new Set(target.split(/\s+/).filter(w=>w.length>3))];
-    const match = words.filter(w=>txt.includes(w)).length;
-    return {...dx, score: match, total: words.length};
-  }).sort((a,b)=>b.score-a.score);
-}
-function getSelDx(){
-  const d = data[alurKasus]; if(!d) return null;
-  const scored = scoreDiagnosa(alurKasus);
-  return scored[window.confirmedDx] || scored[0];
 }
 function alurRenderBody(page, d, kasus){
   const el = document.getElementById('alur-body');
   if(page === 'pengkajian'){
-    const saved = window.assessmentData[alurKasus] || [];
-    const items = [...d.pengkajian.subjektif, ...d.pengkajian.objektif, ...d.pengkajian.vital];
-    const cats = d.pengkajian.subjektif.map(()=>'sub').concat(d.pengkajian.objektif.map(()=>'obj'), d.pengkajian.vital.map(()=>'vit'));
+    const s = d.pengkajian.subjektif, o = d.pengkajian.objektif;
+    const saved = window.assessmentData[alurKasus] || {};
     const sections = [
-      {title:'Data Subjektif (Anamnesis)',start:0,end:d.pengkajian.subjektif.length},
-      {title:'Data Objektif (Pemeriksaan Fisik)',start:d.pengkajian.subjektif.length,end:d.pengkajian.subjektif.length+d.pengkajian.objektif.length},
-      {title:'Fokus Tanda Vital',start:d.pengkajian.subjektif.length+d.pengkajian.objektif.length,end:items.length}
+      {title:'A.1. Keluhan Utama', items: s.keluhanUtama || [] },
+      {title:'A.2. Riwayat Penyakit Sekarang', items: s.riwayatSekarang || [] },
+      {title:'A.3. Riwayat Penyakit Dahulu', items: s.riwayatDahulu || [] },
+      {title:'A.4. Riwayat Keluarga', items: s.riwayatKeluarga || [] },
+      {title:'A.5.a. Kebutuhan Dasar - Nutrisi/Cairan', items: (s.kebutuhanDasar||{}).nutrisiCairan || [] },
+      {title:'A.5.b. Kebutuhan Dasar - Eliminasi', items: (s.kebutuhanDasar||{}).eliminasi || [] },
+      {title:'A.5.c. Kebutuhan Dasar - Aktivitas', items: (s.kebutuhanDasar||{}).aktivitas || [] },
+      {title:'A.5.d. Kebutuhan Dasar - Psikososial', items: (s.kebutuhanDasar||{}).psikososial || [] },
+      {title:'B.1. Tanda-Tanda Vital', items: o.tandaVital || [] },
+      {title:'B.2. Pemeriksaan Fisik', items: o.pemeriksaanFisik || [] },
+      {title:'B.3. Pemeriksaan Penunjang', items: o.penunjang || d.penunjang || [] }
     ];
+    let flatIdx = 0;
     let html = `<div class="res-card"><h3>${kasus.icon} Pengkajian \u2014 ${kasus.label}</h3>
-      <p style="font-size:13px;color:var(--gray);margin-bottom:14px;">Pilih temuan pengkajian sesuai kondisi pasien:</p>`;
+      <p style="font-size:13px;color:var(--gray);margin-bottom:14px;">Isi temuan pengkajian sesuai kondisi pasien:</p>
+      <div style="margin-bottom:10px;font-size:12px;"><span class="panduan-btn" onclick="togglePanduan('pengkajian-${alurKasus}')">\uD83D\uDCD6 Tampilkan Panduan Pengkajian</span></div>
+      <div class="panduan-content" id="panduan-pengkajian-${alurKasus}">`;
     sections.forEach(sec => {
       html += `<div class="subhead">${sec.title}</div>`;
-      for(let i=sec.start; i<sec.end; i++){
-        const v = saved[i] || '';
-        const opts = getDropdownOpts(items[i], cats[i]);
-        html += `<div class="ka-item"><label>${items[i]}</label>
-          <select class="pengkajian-inp" data-idx="${i}" onchange="saveAssessment()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:var(--navy);outline:none;cursor:pointer;">
-            <option value="">-- Pilih --</option>
-            ${opts.map(o => `<option value="${o}"${v===o?' selected':''}>${o}</option>`).join('')}
-          </select></div>`;
-      }
+      sec.items.forEach(item => { html += `<div style="font-size:12px;color:var(--gray);padding:4px 0;">${item}</div>`; });
+    });
+    html += `</div>`;
+    sections.forEach(sec => {
+      html += `<div class="subhead">${sec.title}</div>`;
+      sec.items.forEach(item => {
+        const v = saved[flatIdx] || '';
+        html += `<div class="form-field"><label>${item}</label>
+          <textarea class="form-input pengkajian-inp" data-idx="${flatIdx}" rows="2" oninput="saveAssessment()" placeholder="Ketik temuan...">${escapeHtml(v)}</textarea></div>`;
+        flatIdx++;
+      });
     });
     html += `</div>`;
     el.innerHTML = html;
   } else if(page === 'diagnosa'){
-    const scored = scoreDiagnosa(alurKasus);
-    const p = getPasien();
-    const isEmpty = (window.assessmentData[alurKasus]||[]).filter(v=>v).length===0;
-    el.innerHTML = `
-    <div class="res-card" style="background:var(--mint);border:1.5px solid var(--teal);margin-bottom:14px;">
-      <h3 style="font-size:14px;">\uD83D\uDCA1 Rekomendasi Diagnosa</h3>
-      <p style="font-size:13px;">${isEmpty ? 'Isi data pengkajian terlebih dahulu untuk rekomendasi akurat.' : 'Berdasarkan data pengkajian yang Anda masukkan'+(p.riwayat?', riwayat '+p.riwayat:'')+(p.usia?', usia '+p.usia+' th':'')+(p.kelamin?', '+p.kelamin:'')+', pilih diagnosa yang paling sesuai:'}</p>
-    </div>
-    ${scored.map((dx,i)=>{
-      const pct = dx.total ? Math.round(dx.score/dx.total*100) : 0;
-      const sel = i===window.confirmedDx;
-      return `<div class="res-card${sel?' confirmed':''}" style="${sel?'border:2px solid var(--teal);background:var(--mint);':''}cursor:pointer" onclick="window.confirmedDx=${i};alurRenderBody('diagnosa',data[alurKasus],kasusList.find(k=>k.key===alurKasus))">
-        <div style="display:flex;justify-content:space-between;align-items:start;">
-          <h3><span class="kode">${dx.kode}</span> ${dx.nama}</h3>
-          ${sel?'<span class="badge-rec">\u2705 Dipilih</span>':(i===0&&pct>0?'<span class="badge-rec">\u2B50 Rekomendasi</span>':'')}
-        </div>
-        <div class="def">${dx.def}</div>
-        ${dx.total?`<div class="match-bar-wrap"><div class="match-bar" style="width:${pct}%"></div></div><span style="font-size:11px;color:var(--gray);">Kecocokan: ${pct}%</span>`:''}
-      </div>`;
-    }).join('')}`;
-  } else if(page === 'intervensi'){
-    const topDx = getSelDx();
-    const matched = d.intervensi.filter(iv => iv.dx.toLowerCase().includes((topDx.nama||'').toLowerCase()));
-    const others = d.intervensi.filter(iv => !matched.includes(iv));
-    const chk = window.checkedData['iv-'+alurKasus] || [];
-    const allActs = [];
-    (matched.length?matched:d.intervensi).forEach(iv => {
-      iv.observasi.forEach(a => allActs.push({dx:iv.dx,cat:'Observasi',val:a}));
-      iv.terapeutik.forEach(a => allActs.push({dx:iv.dx,cat:'Terapeutik',val:a}));
-      iv.edukasi.forEach(a => allActs.push({dx:iv.dx,cat:'Edukasi',val:a}));
-      iv.kolaborasi.forEach(a => allActs.push({dx:iv.dx,cat:'Kolaborasi',val:a}));
+    window.diagnosaData = window.diagnosaData || {};
+    let rows = window.diagnosaData[alurKasus] || [{kode:'',nama:'',definisi:''}];
+    let html = '';
+    const suggestions = suggestDiagnoses();
+    if (suggestions.length > 0) {
+      window._suggestions = suggestions;
+      const maxScore = suggestions[0].score;
+      if (rows.length === 1 && !rows[0].kode && !rows[0].nama) {
+        rows[0] = { kode: suggestions[0].kode, nama: suggestions[0].nama, definisi: suggestions[0].def };
+        window.diagnosaData[alurKasus] = rows;
+      }
+      html += `<div class="res-card recommended">
+        <h3 style="margin-bottom:4px;">💡 Saran Diagnosa</h3>
+        <p style="font-size:12px;color:var(--gray);margin-bottom:10px;">Berdasarkan data pengkajian yang Anda masukkan:</p>`;
+      suggestions.forEach((s, idx) => {
+        const pct = maxScore > 0 ? Math.round((s.score / maxScore) * 100) : 0;
+        html += `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong><span class="kode">${s.kode}</span> ${s.nama}</strong>
+            <span style="font-size:13px;font-weight:700;color:var(--teal-dark);">${pct}%</span>
+          </div>
+          <div class="match-bar-wrap"><div class="match-bar" style="width:${pct}%"></div></div>
+          <div style="font-size:11px;color:var(--gray);margin:2px 0 6px;">${s.def}</div>
+          <button class="btn-primary" style="padding:3px 14px;font-size:11px;" onclick="useSuggestedDiagnosis(${idx})">Gunakan</button>
+        </div>`;
+      });
+      if (suggestions.length < 5) html += `<div style="font-size:11px;color:var(--gray);margin-top:6px;">${5 - suggestions.length} diagnosa lagi tersedia di referensi di bawah</div>`;
+      html += `</div>`;
+    }
+    html += `<div class="res-card"><h3>${kasus.icon} Diagnosa Keperawatan</h3>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:14px;">Isikan diagnosa keperawatan yang sesuai:</p>
+      <div style="margin-bottom:10px;"><span class="panduan-btn" onclick="togglePanduan('diagnosa-${alurKasus}')">📖 Tampilkan Referensi Diagnosa</span></div>
+      <div class="panduan-content" id="panduan-diagnosa-${alurKasus}">`;
+    if(d.diagnosa) d.diagnosa.forEach(dx=>{
+      html += `<div style="padding:6px 0;font-size:12px;color:var(--navy);"><strong>${dx.kode}</strong> — ${dx.nama}<br><span style="color:var(--gray);">${dx.def}</span></div>`;
     });
-    const done = chk.filter(v=>v).length;
-    const pct = allActs.length ? Math.round(done/allActs.length*100) : 0;
-    let html = `<div class="res-card" style="background:var(--mint);border:1.5px solid var(--teal);margin-bottom:14px;">
-      <h3 style="font-size:14px;">\uD83D\uDCCB Intervensi: ${topDx.kode} \u2014 ${topDx.nama}</h3>
-      <div class="match-bar-wrap" style="margin-top:8px;height:8px;"><div class="match-bar" style="width:${pct}%"></div></div>
-      <span style="font-size:12px;color:var(--gray);">Kemajuan: ${done}/${allActs.length} (${pct}%)</span>
-    </div>`;
-    if(matched.length){
-      matched.forEach(iv => {
-        html += `<div class="res-card"><h3>\uD83D\uDCC2 ${iv.dx}</h3>`;
-        ['observasi','terapeutik','edukasi','kolaborasi'].forEach(cat => {
-          if(iv[cat].length){
-            html += `<div class="subhead">${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>`;
-            iv[cat].forEach((a,j) => {
-              const idx = allActs.findIndex(x => x.val===a && x.dx===iv.dx);
-              if(idx>=0) html += `<label class="chk-label"><input type="checkbox" class="chk-iv-${alurKasus}" data-idx="${idx}" onchange="saveChecklist('iv-${alurKasus}')" ${chk[idx]?'checked':''}> ${a}</label>`;
-              else html += `<span style="display:block;padding:4px 0;font-size:13px;">${a}</span>`;
-            });
-          }
-        });
-        html += `</div>`;
+    html += `</div><div id="dx-rows">`;
+    rows.forEach((row,i)=>{
+      html += `<div class="dx-row" id="dx-row-${i}">
+        <input class="form-input" style="width:100px;" placeholder="Kode" value="${escapeHtml(row.kode)}" data-idx="${i}" data-field="kode" oninput="saveDxRow()">
+        <input class="form-input" placeholder="Nama Diagnosa" value="${escapeHtml(row.nama)}" data-idx="${i}" data-field="nama" oninput="saveDxRow()">
+        <textarea class="form-input" rows="2" placeholder="Definisi / alasan" data-idx="${i}" data-field="definisi" oninput="saveDxRow()">${escapeHtml(row.definisi)}</textarea>
+        ${rows.length>1?`<button onclick="removeDxRow(${i})">✕</button>`:''}
+      </div>`;
+    });
+    html += `</div><span class="add-row" onclick="addDxRow()">+ Tambah Diagnosa</span></div>`;
+    el.innerHTML = html;
+  } else if(page === 'intervensi'){
+    window.formData = window.formData || {};
+    const saved = window.formData[alurKasus] || {};
+    const cats = ['Observasi','Terapeutik','Edukasi','Kolaborasi'];
+    const catKeys = ['observasi','terapeutik','edukasi','kolaborasi'];
+    const refItems = {observasi:[], terapeutik:[], edukasi:[], kolaborasi:[]};
+    if(d.intervensi) d.intervensi.forEach(iv=>catKeys.forEach(ck=>(iv[ck]||[]).forEach(item=>{
+      if(!refItems[ck].includes(item)) refItems[ck].push(item);
+    })));
+    let html = `<div class="res-card"><h3>${kasus.icon} Intervensi Keperawatan</h3>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:14px;">Centang intervensi yang akan dilakukan:</p>`;
+    cats.forEach((cat,ci)=>{
+      const ck = catKeys[ci];
+      const savedItems = (saved[ck]||'').split('\n').filter(Boolean);
+      html += `<div class="form-field"><label>${cat}</label><div style="margin:4px 0;">`;
+      refItems[ck].forEach(item=>{
+        const checked = savedItems.includes(item) ? 'checked' : '';
+        html += `<label style="display:flex;align-items:flex-start;gap:6px;font-weight:400;font-size:13px;padding:2px 0;cursor:pointer;">
+          <input type="checkbox" data-cat="${ck}" value="${escapeHtml(item)}" ${checked} onchange="saveIntervensi()"> ${escapeHtml(item)}</label>`;
       });
-    }
-    if(others.length){
-      html += `<details style="margin-top:12px;"><summary style="font-size:13px;color:var(--gray);cursor:pointer;">Intervensi lain (${others.length})</summary>`;
-      others.forEach(iv => {
-        html += `<div class="res-card" style="opacity:.7;margin-top:8px;"><h3>\uD83D\uDCC2 ${iv.dx}</h3>`;
-        ['observasi','terapeutik','edukasi','kolaborasi'].forEach(cat => {
-          if(iv[cat].length) html += `<div class="subhead">${cat.charAt(0).toUpperCase()+cat.slice(1)}</div><ul>${iv[cat].map(a=>'<li>'+a+'</li>').join('')}</ul>`;
-        });
-        html += `</div>`;
-      });
-      html += `</details>`;
-    }
+      const extras = savedItems.filter(i=>!refItems[ck].includes(i)).join(', ');
+      html += `</div><input class="form-input" type="text" placeholder="+ Tambah rencana ${cat.toLowerCase()} lain..." 
+        data-cat="${ck}" value="${escapeHtml(extras)}" oninput="saveIntervensi()" style="margin-top:4px;"></div>`;
+    });
+    html += `</div>`;
     el.innerHTML = html;
   } else if(page === 'implementasi'){
-    const chk = window.checkedData['im-'+alurKasus] || [];
-    const done = chk.filter(v=>v).length;
-    const pct = d.implementasi.length ? Math.round(done/d.implementasi.length*100) : 0;
-    el.innerHTML = `<div class="res-card"><h3>\uD83D\uDC89 Implementasi \u2014 ${kasus.label}</h3>
-      <div class="match-bar-wrap" style="margin:8px 0;height:8px;"><div class="match-bar" style="width:${pct}%"></div></div>
-      <span style="font-size:12px;color:var(--gray);display:block;margin-bottom:12px;">Kemajuan: ${done}/${d.implementasi.length} (${pct}%) \u2014 centang yang sudah dilakukan</span>
-      ${d.implementasi.map((a,i)=>`<label class="chk-label"><input type="checkbox" class="chk-im-${alurKasus}" data-idx="${i}" onchange="saveChecklist('im-${alurKasus}')" ${chk[i]?'checked':''}> ${a}</label>`).join('')}</div>`;
+    window.formData = window.formData || {};
+    const saved = window.formData[alurKasus] || {};
+    let html = `<div class="res-card"><h3>${kasus.icon} Implementasi</h3>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:14px;">Catat implementasi tindakan yang dilakukan:</p>
+      <div style="margin-bottom:10px;"><span class="panduan-btn" onclick="togglePanduan('implementasi-${alurKasus}')">📖 Tampilkan Contoh Implementasi</span></div>
+      <div class="panduan-content" id="panduan-implementasi-${alurKasus}">`;
+    if(d.implementasi) d.implementasi.forEach(item=>{html+=`<div style="font-size:12px;color:var(--gray);padding:2px 0;">• ${item}</div>`;});
+    html += `</div>
+      <div class="form-field"><label>Catatan Implementasi</label>
+        <textarea class="form-input" rows="5" id="impl-text" oninput="window.formData[alurKasus]=window.formData[alurKasus]||{};window.formData[alurKasus].implementasi=this.value;" placeholder="Tulis implementasi yang dilakukan...">${escapeHtml(saved.implementasi||'')}</textarea></div>
+      </div>`;
+    el.innerHTML = html;
   } else if(page === 'evaluasi'){
-    const ad = window.assessmentData[alurKasus] || [];
-    const items = [...d.pengkajian.subjektif, ...d.pengkajian.objektif, ...d.pengkajian.vital];
     const ev = window.evaluasiData;
-    const sVal = ev.s || (ad.slice(0, d.pengkajian.subjektif.length).filter(v=>v).length ? ad.slice(0, d.pengkajian.subjektif.length).filter(v=>v).join('; ') : d.evaluasi.s);
-    const oVal = ev.o || (ad.slice(d.pengkajian.subjektif.length, d.pengkajian.subjektif.length+d.pengkajian.objektif.length).filter(v=>v).length ? ad.slice(d.pengkajian.subjektif.length, d.pengkajian.subjektif.length+d.pengkajian.objektif.length).filter(v=>v).join('; ') : d.evaluasi.o);
-    const aVal = ev.a || d.evaluasi.a;
-    const pVal = ev.p || d.evaluasi.p;
-    el.innerHTML = `<div class="res-card"><h3>\u2705 Evaluasi (SOAP) \u2014 ${kasus.label}</h3>
-      <div class="subhead">Status</div>
-      <select id="eval-outcome" onchange="window.evaluasiData.outcome=this.value" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:14px;background:#fff;cursor:pointer;">
-        <option value="">-- Pilih Outcome --</option>
-        <option ${ev.outcome==='Teratasi'?'selected':''}>Teratasi</option>
-        <option ${ev.outcome==='Teratasi Sebagian'?'selected':''}>Teratasi Sebagian</option>
-        <option ${ev.outcome==='Belum Teratasi'?'selected':''}>Belum Teratasi</option>
-        <option ${ev.outcome==='Dirujuk'?'selected':''}>Dirujuk</option>
-      </select>
-      <div class="subhead">S \u2014 Subjektif</div>
-      <textarea rows="2" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;margin-bottom:10px;" oninput="window.evaluasiData.s=this.value">${sVal}</textarea>
-      <div class="subhead">O \u2014 Objektif</div>
-      <textarea rows="2" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;margin-bottom:10px;" oninput="window.evaluasiData.o=this.value">${oVal}</textarea>
-      <div class="subhead">A \u2014 Analisis</div>
-      <textarea rows="2" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;margin-bottom:10px;" oninput="window.evaluasiData.a=this.value">${aVal}</textarea>
-      <div class="subhead">P \u2014 Perencanaan Lanjutan</div>
-      <textarea rows="2" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;margin-bottom:10px;" oninput="window.evaluasiData.p=this.value">${pVal}</textarea>
-    </div>`;
+    let html = `<div class="res-card"><h3>${kasus.icon} Evaluasi (SOAP)</h3>
+      <div class="form-field"><label>Outcome</label>
+        <input class="form-input" id="eval-outcome" value="${escapeHtml(ev.outcome||'')}" placeholder="Teratasi / Teratasi Sebagian / Belum Teratasi / Dirujuk" oninput="window.evaluasiData.outcome=this.value"></div>
+      <div class="form-field"><label>S — Subjektif</label>
+        <textarea class="form-input" rows="3" oninput="window.evaluasiData.s=this.value" placeholder="Kutipan pernyataan pasien...">${escapeHtml(ev.s||'')}</textarea></div>
+      <div class="form-field"><label>O — Objektif</label>
+        <textarea class="form-input" rows="3" oninput="window.evaluasiData.o=this.value" placeholder="Temuan objektif...">${escapeHtml(ev.o||'')}</textarea></div>
+      <div class="form-field"><label>A — Analisis</label>
+        <textarea class="form-input" rows="2" oninput="window.evaluasiData.a=this.value" placeholder="Analisis perbandingan S dan O...">${escapeHtml(ev.a||'')}</textarea></div>
+      <div class="form-field"><label>P — Perencanaan Lanjutan</label>
+        <textarea class="form-input" rows="2" oninput="window.evaluasiData.p=this.value" placeholder="Rencana tindak lanjut...">${escapeHtml(ev.p||'')}</textarea></div>
+      </div>`;
+    el.innerHTML = html;
   } else if(page === 'penunjang'){
-    const chk = window.checkedData['pj-'+alurKasus] || [];
-    const done = chk.filter(v=>v).length;
-    el.innerHTML = `<div class="res-card"><h3>\uD83E\uDDEA Pemeriksaan Penunjang \u2014 ${kasus.label}</h3>
-      <p style="font-size:13px;color:var(--gray);margin-bottom:12px;">Centang pemeriksaan yang diindikasikan/diambil:</p>
-      ${d.penunjang.map((a,i)=>`<label class="chk-label"><input type="checkbox" class="chk-pj-${alurKasus}" data-idx="${i}" onchange="saveChecklist('pj-${alurKasus}')" ${chk[i]?'checked':''}> ${a}</label>`).join('')}
-      <div style="margin-top:12px;font-size:12px;color:var(--gray);">Tercentang: ${done}/${d.penunjang.length}</div></div>`;
+    window.formData = window.formData || {};
+    const saved = window.formData[alurKasus] || {};
+    let html = `<div class="res-card"><h3>${kasus.icon} Pemeriksaan Penunjang</h3>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:14px;">Rencanakan pemeriksaan penunjang yang diperlukan:</p>
+      <div style="margin-bottom:10px;"><span class="panduan-btn" onclick="togglePanduan('penunjang-${alurKasus}')">📖 Tampilkan Referensi Penunjang</span></div>
+      <div class="panduan-content" id="panduan-penunjang-${alurKasus}">`;
+    if(d.penunjang) d.penunjang.forEach(item=>{html+=`<div style="font-size:12px;color:var(--gray);padding:2px 0;">• ${item}</div>`;});
+    html += `</div>
+      <div class="form-field"><label>Rencana Pemeriksaan Penunjang</label>
+        <textarea class="form-input" rows="5" id="penunjang-text" oninput="window.formData[alurKasus]=window.formData[alurKasus]||{};window.formData[alurKasus].penunjang=this.value;" placeholder="Tulis rencana pemeriksaan...">${escapeHtml(saved.penunjang||'')}</textarea></div>
+      </div>`;
+    el.innerHTML = html;
+  } else if(page === 'selesai'){
+    const keluhan = document.getElementById('alur-keluhan').value;
+    const kasusLabel = kasus ? `${kasus.icon} ${kasus.label}` : keluhan;
+    const dxCount = (window.diagnosaData[alurKasus]||[]).length;
+    el.innerHTML = `<div class="res-card" style="text-align:center;padding:40px 20px;">
+      <div style="font-size:48px;margin-bottom:12px;">✅</div>
+      <h3 style="margin:0 0 6px;">Dokumen ASKEP Selesai</h3>
+      <p style="color:var(--gray);font-size:14px;margin-bottom:4px;">${kasusLabel}</p>
+      <p style="color:var(--gray);font-size:13px;margin-bottom:20px;">${dxCount} diagnosa · Data tersimpan otomatis</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="cetakDokumen()">🖨️ Cetak</button>
+        <button class="btn-secondary" onclick="alurReset();showPage('home')">🏠 Kembali ke Beranda</button>
+      </div></div>`;
   }
 }
 
 function alurNext(){
-  saveAssessment();
-  if(alurCurrent===1) window.confirmedDx = 0;
-  if(alurCurrent < 6){ alurCurrent++; renderAlur(); }
-  else showPage('home');
+  if(alurCurrent===0){
+    const keluhanTxt = document.getElementById('alur-keluhan').value.trim();
+    if(!keluhanTxt) return;
+    document.getElementById('alur-selector').style.display = 'none';
+    document.getElementById('alur-content').style.display = 'block';
+    alurCurrent = 1;
+    const matched = kasusList.find(k=>k.label.toLowerCase()===keluhanTxt.toLowerCase()) ||
+                    kasusList.find(k=>keluhanTxt.toLowerCase().includes(k.label.toLowerCase())) ||
+                    kasusList.find(k=>k.label.toLowerCase().includes(keluhanTxt.toLowerCase()));
+    alurKasus = matched ? matched.key : null;
+    renderAlur();
+    return;
+  }
+  saveAll();
+  if(alurCurrent < 7){ alurCurrent++; renderAlur(); }
 }
 function alurPrev(){
   if(alurCurrent > 1){ alurCurrent--; renderAlur(); }
@@ -1291,6 +1815,151 @@ function alurReset(){
   document.getElementById('alur-selector').style.display = '';
   document.getElementById('alur-content').style.display = 'none';
 }
+function saveFormField(step){
+  window.formData = window.formData || {};
+  window.formData[alurKasus] = window.formData[alurKasus] || {};
+  document.querySelectorAll('#alur-body .form-input[data-cat]').forEach(inp=>{
+    window.formData[alurKasus][inp.dataset.cat] = inp.value;
+  });
+}
+function saveIntervensi(){
+  window.formData = window.formData || {};
+  window.formData[alurKasus] = window.formData[alurKasus] || {};
+  const catKeys = ['observasi','terapeutik','edukasi','kolaborasi'];
+  catKeys.forEach(ck => {
+    const checked = [];
+    document.querySelectorAll(`#alur-body input[type="checkbox"][data-cat="${ck}"]:checked`).forEach(cb => checked.push(cb.value));
+    const extra = document.querySelector(`#alur-body input[data-cat="${ck}"].form-input`);
+    if(extra && extra.value.trim()) checked.push(extra.value.trim());
+    window.formData[alurKasus][ck] = checked.join('\n');
+  });
+}
+function saveDxRow(){
+  window.diagnosaData = window.diagnosaData || {};
+  const rows = [];
+  document.querySelectorAll('#dx-rows .dx-row').forEach(row=>{
+    rows.push({
+      kode: row.querySelector('[data-field="kode"]').value,
+      nama: row.querySelector('[data-field="nama"]').value,
+      definisi: row.querySelector('[data-field="definisi"]').value
+    });
+  });
+  window.diagnosaData[alurKasus] = rows;
+}
+function addDxRow(){
+  window.diagnosaData = window.diagnosaData || {};
+  const rows = window.diagnosaData[alurKasus] || [{kode:'',nama:'',definisi:''}];
+  rows.push({kode:'',nama:'',definisi:''});
+  window.diagnosaData[alurKasus] = rows;
+  alurRenderBody('diagnosa', data[alurKasus], kasusList.find(k=>k.key===alurKasus));
+}
+function removeDxRow(idx){
+  let rows = window.diagnosaData[alurKasus] || [];
+  rows.splice(idx,1);
+  if(rows.length===0) rows.push({kode:'',nama:'',definisi:''});
+  window.diagnosaData[alurKasus] = rows;
+  alurRenderBody('diagnosa', data[alurKasus], kasusList.find(k=>k.key===alurKasus));
+}
+const LS_KEY = 'sarco-form-';
+function saveAll(){
+  try {
+    localStorage.setItem(LS_KEY+'assessment', JSON.stringify(window.assessmentData||{}));
+    localStorage.setItem(LS_KEY+'diagnosa', JSON.stringify(window.diagnosaData||{}));
+    localStorage.setItem(LS_KEY+'form', JSON.stringify(window.formData||{}));
+    localStorage.setItem(LS_KEY+'evaluasi', JSON.stringify(window.evaluasiData||{}));
+  } catch(e){}
+}
+function loadAll(){
+  try {
+    const a = localStorage.getItem(LS_KEY+'assessment');
+    if(a) window.assessmentData = JSON.parse(a);
+    const d = localStorage.getItem(LS_KEY+'diagnosa');
+    if(d) window.diagnosaData = JSON.parse(d);
+    const f = localStorage.getItem(LS_KEY+'form');
+    if(f) window.formData = JSON.parse(f);
+    const e = localStorage.getItem(LS_KEY+'evaluasi');
+    if(e) window.evaluasiData = JSON.parse(e);
+  } catch(e){}
+}
+function clearAll(){
+  window.assessmentData = {};
+  window.diagnosaData = {};
+  window.formData = {};
+  window.evaluasiData = {};
+  ['assessment','diagnosa','form','evaluasi'].forEach(k=>localStorage.removeItem(LS_KEY+k));
+}
+function cetakDokumen(){
+  const keluhan = document.getElementById('alur-keluhan').value;
+  const kasus = kasusList.find(k=>k.key===alurKasus);
+  const ref = data[alurKasus];
+  const asm = window.assessmentData[alurKasus]||{};
+  const dxs = window.diagnosaData[alurKasus]||[];
+  const fd = window.formData[alurKasus]||{};
+  const ev = window.evaluasiData;
+  let h = `<html><head><meta charset="utf-8"><title>Dokumen ASKEP</title>
+<style>
+body{font-family:Arial,sans-serif;font-size:12px;color:#222;max-width:210mm;margin:0 auto;padding:20px;}
+h2{font-size:16px;border-bottom:2px solid #047878;padding-bottom:4px;margin-top:24px;}
+h3{font-size:14px;margin:16px 0 4px;}
+table{width:100%;border-collapse:collapse;margin:8px 0;}
+td,th{text-align:left;padding:4px 6px;border:1px solid #ccc;vertical-align:top;}
+th{background:#e8f3e8;font-size:11px;}
+.s{background:#f5f9f5;padding:6px;margin:6px 0;border-left:3px solid #047878;font-size:12px;}
+@media print{body{padding:0;}button{display:none;}}
+</style></head><body>
+<h2 style="margin-top:0;">DOKUMEN ASUHAN KEPERAWATAN</h2>
+<div class="s"><b>Keluhan Utama:</b> ${escapeHtml(keluhan)}</div>`;
+
+  if(ref){
+    const s = ref.pengkajian.subjektif, o = ref.pengkajian.objektif;
+    const cetakSections = [
+      {title:'A.1. Keluhan Utama', items: s.keluhanUtama || [] },
+      {title:'A.2. Riwayat Penyakit Sekarang', items: s.riwayatSekarang || [] },
+      {title:'A.3. Riwayat Penyakit Dahulu', items: s.riwayatDahulu || [] },
+      {title:'A.4. Riwayat Keluarga', items: s.riwayatKeluarga || [] },
+      {title:'A.5.a. Kebutuhan Dasar - Nutrisi/Cairan', items: (s.kebutuhanDasar||{}).nutrisiCairan || [] },
+      {title:'A.5.b. Kebutuhan Dasar - Eliminasi', items: (s.kebutuhanDasar||{}).eliminasi || [] },
+      {title:'A.5.c. Kebutuhan Dasar - Aktivitas', items: (s.kebutuhanDasar||{}).aktivitas || [] },
+      {title:'A.5.d. Kebutuhan Dasar - Psikososial', items: (s.kebutuhanDasar||{}).psikososial || [] },
+      {title:'B.1. Tanda-Tanda Vital', items: o.tandaVital || [] },
+      {title:'B.2. Pemeriksaan Fisik', items: o.pemeriksaanFisik || [] },
+      {title:'B.3. Pemeriksaan Penunjang', items: o.penunjang || ref.penunjang || [] }
+    ];
+    let flatIdx = 0;
+    h += `<h2>PENGKAJIAN</h2>`;
+    cetakSections.forEach(sec => {
+      h += `<table><tr><th>${sec.title}</th><th>Data</th></tr>`;
+      sec.items.forEach(item => {
+        h += `<tr><td>${escapeHtml(item)}</td><td>${escapeHtml(asm[flatIdx]||'')}</td></tr>`;
+        flatIdx++;
+      });
+      h += `</table>`;
+    });
+    if(dxs.length){
+      h += `<h2>DIAGNOSA KEPERAWATAN</h2><table><tr><th>Kode</th><th>Diagnosa</th><th>Definisi</th></tr>`;
+      dxs.forEach(dx=>{h+=`<tr><td>${escapeHtml(dx.kode)}</td><td>${escapeHtml(dx.nama)}</td><td>${escapeHtml(dx.definisi)}</td></tr>`;});
+      h += `</table>`;
+    }
+    h += `<h2>INTERVENSI</h2>`;
+    ['observasi','terapeutik','edukasi','kolaborasi'].forEach(k=>{
+      const v = fd[k];
+      if(v) h += `<div class="s"><b>${k.charAt(0).toUpperCase()+k.slice(1)}</b><br>${escapeHtml(v).replace(/\n/g,'<br>')}</div>`;
+    });
+    if(fd.implementasi) h += `<h2>IMPLEMENTASI</h2><div class="s">${escapeHtml(fd.implementasi).replace(/\n/g,'<br>')}</div>`;
+    h += `<h2>EVALUASI (SOAP)</h2><table><tr><th>Outcome</th><td>${escapeHtml(ev.outcome||'')}</td></tr>`;
+    h += `<tr><th>S - Subjektif</th><td>${escapeHtml(ev.s||'')}</td></tr>`;
+    h += `<tr><th>O - Objektif</th><td>${escapeHtml(ev.o||'')}</td></tr>`;
+    h += `<tr><th>A - Analisis</th><td>${escapeHtml(ev.a||'')}</td></tr>`;
+    h += `<tr><th>P - Planning</th><td>${escapeHtml(ev.p||'')}</td></tr></table>`;
+    if(fd.penunjang) h += `<h2>PEMERIKSAAN PENUNJANG</h2><div class="s">${escapeHtml(fd.penunjang).replace(/\n/g,'<br>')}</div>`;
+  }
+  h += `<p style="text-align:center;color:#999;margin-top:30px;font-size:10px;">Dokumen dibuat melalui portal SARCO · ${new Date().toLocaleDateString('id-ID')}</p>
+<button onclick="window.print()" style="display:block;margin:20px auto;padding:12px 32px;font-size:14px;cursor:pointer;">🖨️ Cetak / Simpan PDF</button></body></html>`;
+  const w = window.open('','_blank');
+  w.document.write(h);
+  w.document.close();
+}
+loadAll();
 </script>
 
 </body>
